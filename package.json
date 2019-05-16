@@ -18,7 +18,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "parcel ./src/index.html"
+    "dev": "parcel ./src/index.html",
+    "build": "PARCEL_WORKERS=1 parcel build ./src/index.html -o index.html  -d deploy --public-url . --no-source-maps --detailed-report"
   },
   "name": "viisuvoter",
   "version": "1.0.0",
