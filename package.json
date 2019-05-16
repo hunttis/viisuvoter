@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "bulma": "^0.7.4",
+    "firebase": "^6.0.2",
+    "lodash": "^4.17.11",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-redux": "^4.4.8 || ^5.0.7",
+    "react-redux-firebase": "^2.2.6",
+    "react-redux-form": "^1.16.13",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.17",
+    "parcel-bundler": "^1.12.3",
+    "typescript": "^3.4.5"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "parcel ./src/index.html"
+  },
+  "name": "viisuvoter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT"
+}
