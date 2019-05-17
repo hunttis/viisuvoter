@@ -12,17 +12,24 @@
     "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
     "@types/react": "^16.8.17",
     "parcel-bundler": "^1.12.3",
+    "redux-devtools-extension": "^2.13.8",
     "typescript": "^3.4.5"
   },
   "scripts": {
     "start": "node index.js",
     "dev": "parcel ./src/index.html",
-    "build": "PARCEL_WORKERS=1 parcel build ./src/index.html -o index.html  -d deploy --public-url . --no-source-maps --detailed-report"
+    "build": "PARCEL_WORKERS=1 parcel build ./src/index.html -o index.html -d deploy --public-url . --no-source-maps --detailed-report"
   },
   "name": "viisuvoter",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "browserslist": [
+    "last 2 Chrome versions"
+  ]
 }

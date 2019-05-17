@@ -6,14 +6,15 @@ import { reactReduxFirebase, firebaseReducer } from 'react-redux-firebase';
 import Countries from './Components/Countries/Countries-container';
 import firebase from 'firebase/app';
 import 'firebase/database';
-import 'bulma/css/bulma.css'
+import 'bulma/css/bulma.css';
+import './mystyle.css';
 
 import firebaseConfig from '../config.js';
  
 const rrfConfig = {
   userProfile: 'users',
 }
- 
+
 firebase.initializeApp(firebaseConfig)
  
 const createStoreWithFirebase = compose(
