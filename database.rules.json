@@ -1,6 +1,25 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    "countries": {
+      ".read": "true"
+    },
+    "users": {
+      "$userid": {
+        ".read": "(auth != null && auth.uid == $userid)",
+        ".write": "(auth != null && auth.uid == $userid)"
+      }
+    },
+    "votes": {
+      "$currentYear": {
+        "$groupName": {
+          "$userid": {
+            ".read": "true",
+            ".write": "(auth != null && auth.uid == $userid)"
+          }
+        }
+      },
+      ".read": "true",
+      ".write": "true"
+    }
   }
 }
