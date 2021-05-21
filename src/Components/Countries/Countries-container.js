@@ -9,6 +9,7 @@ import _ from "lodash";
 class Countries extends Component {
   constructor(props) {
     super(props);
+    this.state = {};
   }
 
   onChange(groupName) {
@@ -88,6 +89,93 @@ class Countries extends Component {
   }
 
   calculateResults() {
+    const sortedLocalCountryScores = this.calculateLocalGroupScores();
+    return (
+      <div className="">
+        {sortedLocalCountryScores.map((country, index) => {
+          return this.renderCountryScore(country, index);
+        })}
+      </div>
+    );
+  }
+
+  calculateGlobalResults() {
+    const sortedGlobalCountryScores = this.calculateGlobalScores();
+
+    return (
+      <div className="">
+        {sortedGlobalCountryScores.map((country, index) => {
+          return this.renderCountryScore(
+            country,
+            index,
+            "has-background-success-dark"
+          );
+        })}
+      </div>
+    );
+  }
+
+  renderCountryScore(country, index, additionalStyles = "") {
+    let color = "";
+    if (index === 0) {
+      color = "has-text-success";
+    } else if (index === 1 || index === 2) {
+      color = "has-text-info";
+    } else if (index > 9) {
+      color = "has-text-grey";
+    }
+    // let size =
+    //   index === 0 ? "is-10" : "is-one-quarter-tablet is-half-mobile";
+    let size = "is-4";
+    let fontSize = "is-small";
+    return (
+      <div
+        key={country.name}
+        className={`${size} ${color} ${additionalStyles}`}
+      >
+        <div className={`is-fullwidth is-outlined ${color} ${fontSize}`}>
+          {index + 1}.&nbsp;{country.name}
+          &nbsp;-&nbsp;{country.votes}
+        </div>
+      </div>
+    );
+  }
+
+  calculateGlobalScores() {
+    const activeVote = this.props.countries.activeVote;
+    const countries = this.props.countries[activeVote].map((country) => {
+      let votes = 0;
+      console.log("------ THING: ", this.props.votes[activeVote]);
+      Object.entries(this.props.votes[activeVote]).forEach((groupEntry) => {
+        const groupName = groupEntry[0];
+        const groupVotes = groupEntry[1];
+        console.log("Group:", groupName, groupVotes);
+        Object.entries(groupVotes).map((groupVoteEntry) => {
+          const voter = groupVoteEntry[0];
+          const votesFromUser = groupVoteEntry[1];
+          console.log("VOTER", voter);
+          console.log("---> VOTES", votesFromUser);
+
+          Object.entries(votesFromUser).map((entry) => {
+            const voteValue = entry[0];
+            const forCountry = entry[1];
+            if (forCountry === country && voteValue) {
+              votes += parseInt(voteValue);
+            }
+          });
+        });
+      });
+      // console.log("Groups: ", groups);
+      return { name: country, votes };
+    });
+    console.log("Countries: ", countries);
+    const compactedCountries = _.compact(countries);
+    return _.sortBy(compactedCountries, (country) => {
+      return country.votes;
+    }).reverse();
+  }
+
+  calculateLocalGroupScores() {
     const activeVote = this.props.countries.activeVote;
     const groupName = this.props.profile[activeVote].groupName;
 
@@ -113,34 +201,9 @@ class Countries extends Component {
 
     const compactedCountries = _.compact(countries);
 
-    const sortedCountries = _.sortBy(compactedCountries, (country) => {
+    return _.sortBy(compactedCountries, (country) => {
       return country.votes;
     }).reverse();
-
-    return (
-      <div className="columns is-multiline is-centered is-mobile">
-        {sortedCountries.map((country, index) => {
-          let color = index === 0 ? "is-success" : "is-white";
-          color = index > 9 ? "is-dark" : color;
-          let size =
-            index === 0 ? "is-10" : "is-one-quarter-tablet is-half-mobile";
-          let fontSize =
-            index === 0 ? "is-size-4-mobile is-size-1-tablet" : "is-small";
-          return (
-            <div key={country.name} className={`column ${size}`}>
-              <div
-                className={`button is-fullwidth is-outlined ${color} ${fontSize}`}
-              >
-                <span className="has-text-white">
-                  {index + 1}.&nbsp;{country.name}
-                </span>
-                &nbsp;-&nbsp;{country.votes}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
   }
 
   render() {
@@ -173,7 +236,7 @@ class Countries extends Component {
       );
     }
 
-    if (!isLoaded(countries)) {
+    if (!isLoaded(countries) && !isLoaded(profile)) {
       return (
         <h1 className="title has-text-centered has-text-white">
           <br />
@@ -273,8 +336,25 @@ class Countries extends Component {
           }
         )}
         <hr></hr>
-        <h2 className="subtitle has-text-white">Current point totals</h2>
-        {this.calculateResults()}
+
+        <div className="columns">
+          <div className="column">
+            <h2 className="subtitle has-text-white">
+              Current point totals for{" "}
+              <strong className="has-text-white">YOUR</strong> voting group
+            </h2>
+            {this.calculateResults()}
+          </div>
+          <hr className="is-hidden-desktop" />
+          <div className="column">
+            <h2 className="subtitle has-text-white">
+              Current point totals{" "}
+              <strong className="has-text-white">ACROSS ALL</strong> voting
+              groups
+            </h2>
+            {this.calculateGlobalResults()}
+          </div>
+        </div>
 
         <button
           className="button is-pulled-right is-warning is-outlined is-small"
