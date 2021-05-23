@@ -1,10 +1,12 @@
-import React, { Fragment, Component } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
 import { compose } from "redux";
-import { firebaseConnect, isLoaded, isEmpty } from "react-redux-firebase";
+import { isLoaded, isEmpty, firebaseConnect } from "react-redux-firebase";
 import firebase from "firebase/app";
 import "firebase/auth";
 import _ from "lodash";
+import { ResultTableLocal } from "./ResultTableLocal";
+import { ResultTableGlobal } from "./ResultTableGlobal";
 
 class Countries extends Component {
   constructor(props) {
@@ -86,124 +88,6 @@ class Countries extends Component {
   async logout() {
     await firebase.logout();
     window.location.reload();
-  }
-
-  calculateResults() {
-    const sortedLocalCountryScores = this.calculateLocalGroupScores();
-    return (
-      <div className="">
-        {sortedLocalCountryScores.map((country, index) => {
-          return this.renderCountryScore(country, index);
-        })}
-      </div>
-    );
-  }
-
-  calculateGlobalResults() {
-    const sortedGlobalCountryScores = this.calculateGlobalScores();
-
-    return (
-      <div className="">
-        {sortedGlobalCountryScores.map((country, index) => {
-          return this.renderCountryScore(
-            country,
-            index,
-            "has-background-success-dark"
-          );
-        })}
-      </div>
-    );
-  }
-
-  renderCountryScore(country, index, additionalStyles = "") {
-    let color = "";
-    if (index === 0) {
-      color = "has-text-success";
-    } else if (index === 1 || index === 2) {
-      color = "has-text-info";
-    } else if (index > 9) {
-      color = "has-text-grey";
-    }
-    // let size =
-    //   index === 0 ? "is-10" : "is-one-quarter-tablet is-half-mobile";
-    let size = "is-4";
-    let fontSize = "is-small";
-    return (
-      <div
-        key={country.name}
-        className={`${size} ${color} ${additionalStyles}`}
-      >
-        <div className={`is-fullwidth is-outlined ${color} ${fontSize}`}>
-          {index + 1}.&nbsp;{country.name}
-          &nbsp;-&nbsp;{country.votes}
-        </div>
-      </div>
-    );
-  }
-
-  calculateGlobalScores() {
-    const activeVote = this.props.countries.activeVote;
-    const countries = this.props.countries[activeVote].map((country) => {
-      let votes = 0;
-      console.log("------ THING: ", this.props.votes[activeVote]);
-      Object.entries(this.props.votes[activeVote]).forEach((groupEntry) => {
-        const groupName = groupEntry[0];
-        const groupVotes = groupEntry[1];
-        console.log("Group:", groupName, groupVotes);
-        Object.entries(groupVotes).map((groupVoteEntry) => {
-          const voter = groupVoteEntry[0];
-          const votesFromUser = groupVoteEntry[1];
-          console.log("VOTER", voter);
-          console.log("---> VOTES", votesFromUser);
-
-          Object.entries(votesFromUser).map((entry) => {
-            const voteValue = entry[0];
-            const forCountry = entry[1];
-            if (forCountry === country && voteValue) {
-              votes += parseInt(voteValue);
-            }
-          });
-        });
-      });
-      // console.log("Groups: ", groups);
-      return { name: country, votes };
-    });
-    console.log("Countries: ", countries);
-    const compactedCountries = _.compact(countries);
-    return _.sortBy(compactedCountries, (country) => {
-      return country.votes;
-    }).reverse();
-  }
-
-  calculateLocalGroupScores() {
-    const activeVote = this.props.countries.activeVote;
-    const groupName = this.props.profile[activeVote].groupName;
-
-    const countries = this.props.countries[activeVote].map((country) => {
-      let votes = 0;
-
-      for (const voter in this.props.votes[activeVote][groupName]) {
-        const voterEntries = Object.entries(
-          this.props.votes[activeVote][groupName][voter]
-        );
-
-        voterEntries.map((entry) => {
-          const voteValue = entry[0];
-          const forCountry = entry[1];
-          if (forCountry === country) {
-            votes += parseInt(voteValue);
-          }
-        });
-      }
-
-      return { name: country, votes };
-    });
-
-    const compactedCountries = _.compact(countries);
-
-    return _.sortBy(compactedCountries, (country) => {
-      return country.votes;
-    }).reverse();
   }
 
   render() {
@@ -338,25 +222,15 @@ class Countries extends Component {
         <hr></hr>
 
         <div className="columns">
-          <div className="column">
-            <h2 className="subtitle has-text-white">
-              Current point totals for{" "}
-              <strong className="has-text-white">YOUR</strong> voting group:{" "}
-              <span className="has-text-success">
-                {profile[countries.activeVote].groupName}
-              </span>
-            </h2>
-            {this.calculateResults()}
-          </div>
+          <ResultTableLocal
+            profile={profile}
+            countries={countries}
+            votes={votes}
+          />
+
           <hr className="is-hidden-desktop" />
-          <div className="column">
-            <h2 className="subtitle has-text-white">
-              Current point totals{" "}
-              <strong className="has-text-white">ACROSS ALL</strong> voting
-              groups
-            </h2>
-            {this.calculateGlobalResults()}
-          </div>
+
+          <ResultTableGlobal countries={countries} votes={votes} />
         </div>
 
         <button
