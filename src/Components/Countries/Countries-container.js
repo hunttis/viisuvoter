@@ -341,7 +341,10 @@ class Countries extends Component {
           <div className="column">
             <h2 className="subtitle has-text-white">
               Current point totals for{" "}
-              <strong className="has-text-white">YOUR</strong> voting group
+              <strong className="has-text-white">YOUR</strong> voting group:{" "}
+              <span className="has-text-success">
+                {profile[countries.activeVote].groupName}
+              </span>
             </h2>
             {this.calculateResults()}
           </div>
