@@ -4,10 +4,10 @@ import { Provider } from "react-redux";
 import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import Countries from "./Components/MainView";
 import createReduxStore from "./createStore";
-import "firebase/database";
+import "firebase/compat/database";
 import "bulma/css/bulma.css";
 import "./mystyle.css";
-import firebase from "firebase/app";
+import firebase from "firebase/compat/app";
 import firebaseConfig from "../config.js";
 
 firebase.initializeApp(firebaseConfig);
