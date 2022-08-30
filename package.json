@@ -10,7 +10,7 @@
     "react-redux-firebase": "^3.11.0",
     "redux": "^4.2.0",
     "redux-thunk": "^2.4.1",
-    "vite": "^2.9.8"
+    "vite": "^2.9.13"
   },
   "devDependencies": {
     "@babel/core": "^7.17.10",
