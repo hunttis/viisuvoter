@@ -1,36 +1,26 @@
 {
   "dependencies": {
-    "@vitejs/plugin-react": "^1.3.2",
-    "bulma": "^0.9.3",
-    "firebase": "^9.8.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "bulma": "^1.0.0",
+    "firebase": "^10.9.0",
     "lodash": "^4.17.21",
-    "react": "^17",
-    "react-dom": "^17",
-    "react-redux": "^8.0.1",
-    "react-redux-firebase": "^3.11.0",
-    "redux": "^4.2.0",
-    "redux-thunk": "^2.4.1",
-    "vite": "^2.9.8"
+    "prettier": "^3.2.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "vite": "^5.2.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.10",
-    "@babel/plugin-proposal-class-properties": "^7.16.7",
-    "@babel/preset-env": "^7.17.10",
-    "@types/react": "^18.0.9",
-    "parcel-bundler": "^1.3.1",
-    "redux-devtools-extension": "^2.13.9",
-    "typescript": "^4.6.4"
+    "typescript": "^5.4.3"
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "parcel ./src/index.html",
-    "build": "PARCEL_WORKERS=1 parcel build ./src/index.html -o index.html -d deploy --public-url . --no-source-maps --detailed-report",
+    "dev": "vite",
     "vite": "vite",
     "vite-build": "vite build"
   },
   "name": "viisuvoter",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.tsx",
   "license": "MIT",
   "browserslist": [
     "last 2 Chrome versions"
