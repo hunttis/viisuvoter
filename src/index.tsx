@@ -1,10 +1,8 @@
 import React from 'react'
-import { render } from 'react-dom'
 import { initializeApp } from 'firebase/app'
 import { MainView } from './Components/MainView.jsx'
 import { createRoot } from 'react-dom/client'
 
-import 'firebase/compat/database'
 import 'bulma/css/bulma.css'
 import './mystyle.css'
 
@@ -16,7 +14,7 @@ const App = () => {
   const firebaseApp = initializeApp(firebaseConfig)
 
   return (
-    <div className="App">
+    <div className="App" data-theme="dark">
       <MainView />
     </div>
   )

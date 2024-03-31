@@ -8,8 +8,10 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
 } from 'firebase/auth'
-import { getDatabase, onValue, ref, set } from 'firebase/database'
+import { getDatabase, onValue, ref, set, update } from 'firebase/database'
 import { VoteScreen } from './VoteScreen'
+import { LandingPage } from './LandingPage'
+import { ChooseVotingGroupPage } from './ChooseVotingGroupPage'
 
 export type Profile = {
   displayName: string
@@ -17,7 +19,7 @@ export type Profile = {
 }
 
 export type Countries = {
-  [key: string]: [string, string]
+  [key: number]: string
 }
 
 export type Votes = {
@@ -28,20 +30,41 @@ export type Votes = {
   }
 }
 
+export type UserVotes = {
+  [key: number]: string
+}
+
+export type GroupVotes = {
+  [key: string]: {
+    [key: number]: string
+  }
+}
+
+export type GlobalVotes = {
+  [key: string]: GroupVotes
+}
+
+export const pointAmounts = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
+
 export const MainView = () => {
   const provider = new GoogleAuthProvider()
   const [groupName, setGroupName] = useState<string>('')
   const [activeGroupName, setActiveGroupName] = useState<string>('')
-  const [countries, setCountries] = useState<Countries>({})
+  const [countries, setCountries] = useState<Countries>([])
   const [profile, setProfile] = useState<Profile>({})
   const [activeVote, setActiveVote] = useState<string>('')
   const [uid, setUid] = useState<string>('')
   const [votes, setVotes] = useState({})
+  const [castVotes, setCastVotes] = useState({})
+  const [currentUserVotes, setCurrentUserVotes] = useState<UserVotes>([])
+  const [currentGroupVotes, setCurrentGroupVotes] = useState<GroupVotes>([])
+  const [globalVotes, setGlobalVotes] = useState({})
 
   const onChange = (value) => {
     setGroupName(value)
   }
 
+  // USER PROFILE AND DATA
   useEffect(() => {
     const auth = getAuth()
 
@@ -68,30 +91,50 @@ export const MainView = () => {
     return () => unsubscribe()
   }, [activeVote])
 
+  // COUNTRIES
   useEffect(() => {
+    console.log('trying to get countries. activeVote present: ', activeVote)
+
+    if (!activeVote) return
+
     const db = getDatabase()
-    const countriesRef = ref(db, 'countries')
+    const countriesRef = ref(db, `countries/${activeVote}`)
     const unsubscribe = onValue(countriesRef, (snapshot) => {
       const data = snapshot.val()
       setCountries(data)
-      console.log('Countries: ', data)
     })
 
     return () => unsubscribe()
   }, [activeVote])
 
+  // VOTES
   useEffect(() => {
+    console.log('trying to get votes. activeVote present: ', activeVote)
+
+    if (!activeVote) return
+
     const db = getDatabase()
+
     const votesRef = ref(db, `votes/${activeVote}`)
     const unsubscribe = onValue(votesRef, (snapshot) => {
+      console.log('Updating votes!')
       const data = snapshot.val()
       setVotes(data)
+      setCurrentUserVotes(data?.[activeGroupName]?.[profile.displayName])
+      setCurrentGroupVotes(data?.[activeGroupName])
+      setGlobalVotes(data)
+
       console.log('Votes: ', data)
+      const castVotes =
+        votes[activeVote]?.[activeGroupName]?.[profile.displayName]
+      console.log('Setting cast votes: ', castVotes)
+      setCastVotes(castVotes)
     })
 
     return () => unsubscribe()
-  }, [activeVote])
+  }, [activeVote, activeGroupName, profile])
 
+  // ACTIVE VOTE
   useEffect(() => {
     const db = getDatabase()
     const activeVoteRef = ref(db, 'activeVote')
@@ -148,33 +191,55 @@ export const MainView = () => {
   }
 
   const vote = (points, country) => {
+    console.log('Voting for ', points, country)
     let countryAlreadyHasVote = false
     let whichPointsAlreadyHadVote: string | null = null
 
-    const votesForUser = votes
-      ? votes[activeVote][groupName][profile.displayName]
-      : {}
-
-    for (const vote in votesForUser) {
-      if (country === votesForUser[vote]) {
-        countryAlreadyHasVote = true
-        whichPointsAlreadyHadVote = vote
-      }
+    if (currentUserVotes) {
+      Object.entries(currentUserVotes).forEach(([points, country]) => {
+        if (country === country) {
+          countryAlreadyHasVote = true
+          whichPointsAlreadyHadVote = points
+        }
+      })
     }
+
     const db = getDatabase()
 
     if (countryAlreadyHasVote) {
-      // Update this code to be the same as above firebase set
-      set(ref(db, `votes/${activeVote}/${groupName}/${profile.displayName}`), {
+      console.log('Updating vote')
+      console.log({
         [points]: country,
         [whichPointsAlreadyHadVote!]: null,
       })
+      update(
+        ref(
+          db,
+          `votes/${activeVote}/${activeGroupName}/${profile.displayName}`,
+        ),
+        {
+          [points]: country,
+          [whichPointsAlreadyHadVote!]: null,
+        },
+      )
     } else {
-      set(ref(db, `votes/${activeVote}/${groupName}/${profile.displayName}`), {
-        [points]: country,
-      })
+      console.log('Adding new vote')
+      update(
+        ref(
+          db,
+          `votes/${activeVote}/${activeGroupName}/${profile.displayName}`,
+        ),
+        {
+          [points]: country,
+        },
+      )
     }
   }
+
+  console.log('currentUserVotes: ', currentUserVotes)
+  console.log('currentGroupVotes: ', currentGroupVotes)
+  console.log('globalVotes: ', globalVotes)
+  console.log('countries: ', countries)
 
   const auth = getAuth()
   const currentUser = auth.currentUser
@@ -183,93 +248,69 @@ export const MainView = () => {
   const showLogin = countries && !currentUser
   const showJoinGroup =
     countries && currentUser && activeVote && !activeGroupName
-  const showJoinedGroup = countries && uid && activeGroupName
-
-  const pointAmounts = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
-  const castVotes = votes[activeVote]?.[groupName]?.[profile.displayName] || {}
+  const showVoting = countries && uid && activeGroupName && activeVote
 
   return (
-    <div className="section">
+    <div>
       {showLoading && (
-        <h1 className="title has-text-centered has-text-white">
+        <h1 className="title has-text-centered ">
           <br />
           <br />
           <button className="button is-success is-loading">Loading</button>
         </h1>
       )}
-      {!showLoading && showLogin && (
-        <div className="level">
-          <div className="level-item">
-            <button
-              className="button is-success is-outlined"
-              onClick={loginGoogle}
-            >
-              Google Login
-            </button>
-          </div>
-        </div>
+      {!showLoading && showLogin && <LandingPage loginGoogle={loginGoogle} />}
+      {!showLoading && showJoinGroup && (
+        <ChooseVotingGroupPage
+          setGroupName={onChange}
+          onSubmitGroupName={onSubmitGroupName}
+        />
       )}
-      {showJoinGroup && (
-        <div className="field is-horizontal">
-          <div className="field-label">
-            <label className="label has-text-white">Voting group</label>
-          </div>
-          <div className="field-body">
-            <input
-              className="input"
-              onChange={(event) => setGroupName(event.target.value)}
-            />
-          </div>
-          <div className="field-body">
-            <button
-              className="button is-info"
-              onClick={() => onSubmitGroupName()}
-            >
-              Join
-            </button>
-            <button className="button is-warning" onClick={leaveVotingGroup}>
-              Clear voting group
-            </button>
-          </div>
-        </div>
-      )}
-      {showJoinedGroup && (
+      {!showLoading && showVoting && (
         <>
-          <VoteScreen
-            countries={countries}
-            castVotes={castVotes}
-            pointAmounts={pointAmounts}
-            vote={vote}
-          />
-          <div className="columns">
-            <ResultTableLocal
-              profile={profile}
+          <div className="section">
+            <VoteScreen
               countries={countries}
-              votes={votes}
-              groupName={activeGroupName}
-            />
-            <hr className="is-hidden-desktop" />
-            <ResultTableGlobal
-              countries={countries}
-              votes={votes}
+              currentUserVotes={currentUserVotes}
+              vote={vote}
               activeVote={activeVote}
+              activeGroupName={activeGroupName}
             />
+          </div>
+          <div className="section is-align-self-center">
+            <div className="columns">
+              <ResultTableLocal
+                countries={countries}
+                currentGroupVotes={currentGroupVotes}
+                groupName={activeGroupName}
+                activeVote={activeVote}
+              />
+              <hr className="is-hidden-desktop" />
+              <ResultTableGlobal
+                countries={countries}
+                globalVotes={globalVotes}
+                activeVote={activeVote}
+              />
+            </div>
           </div>
         </>
       )}
-
-      <button
-        className="button is-pulled-right is-warning is-outlined is-small"
-        onClick={() => leaveVotingGroup()}
-      >
-        Leave voting group
-      </button>
-      <button
-        className="button is-pulled-right is-danger is-outlined is-small"
-        onClick={() => logout()}
-      >
-        Log out
-      </button>
+      {!showLoading && (
+        <>
+          <button
+            className="button is-pulled-right is-warning is-outlined is-small"
+            onClick={() => leaveVotingGroup()}
+          >
+            Leave voting group
+          </button>
+          <button
+            className="button is-pulled-right is-danger is-outlined is-small"
+            onClick={() => logout()}
+          >
+            Log out
+          </button>
+        </>
+      )}
     </div>
   )
 }

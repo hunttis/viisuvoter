@@ -1,56 +1,65 @@
 import React from 'react'
 import _ from 'lodash'
 import { CountryScore } from './CountryScore'
-import { Countries, Votes } from './MainView'
+import { Countries, GlobalVotes, Votes } from './MainView'
 
 type GlobalTableProps = {
-  countries: Countries
-  votes: Votes
+  countries: string[]
+  globalVotes: GlobalVotes
   activeVote: string
+}
+
+type CountryVotes = {
+  name: string
+  votes: number
 }
 
 export const ResultTableGlobal = ({
   countries,
-  votes,
+  globalVotes,
   activeVote,
 }: GlobalTableProps) => {
-  const sortedGlobalCountryScores = calculateGlobalScores(
+  if (!countries || !activeVote || !globalVotes) {
+    return <div>Global scores not yet available</div>
+  }
+
+  const sortedGlobalCountryScores: CountryVotes[] = calculateGlobalScores(
     countries,
-    votes,
+    globalVotes,
     activeVote,
   )
 
   return (
     <div className="column">
-      <h2 className="subtitle has-text-white">
-        Current point totals{' '}
-        <strong className="has-text-white">ACROSS ALL</strong> voting groups
+      <h2 className="subtitle ">
+        Current point totals <strong>ACROSS ALL</strong> voting groups
       </h2>
-      {sortedGlobalCountryScores.map((country: string, index: string) => (
-        <div key={`${index + country}`}>
-          <CountryScore country={country} index={index} />
-        </div>
-      ))}
+      {sortedGlobalCountryScores.map(
+        (countryVotes: CountryVotes, index: number) => (
+          <div key={`${index + countryVotes.name}`}>
+            <CountryScore countryVotes={countryVotes} index={index} />
+          </div>
+        ),
+      )}
     </div>
   )
 }
 
 const calculateGlobalScores = (
-  countries: Countries,
-  votes: Votes,
+  countries: string[],
+  globalVotes: GlobalVotes,
   activeVote: string,
 ) => {
   let scoreMap = {}
 
-  countries[activeVote]
+  countries
     .filter((country) => country)
     .forEach((country) => {
       scoreMap[country] = 0
     })
 
-  if (votes && activeVote && Object.entries(votes).length > 0) {
-    const currentVotes = votes[activeVote] || {}
-    Object.entries(currentVotes).forEach((groupEntry) => {
+  if (globalVotes && activeVote && Object.entries(globalVotes).length > 0) {
+    Object.entries(globalVotes).forEach((groupEntry) => {
       const [groupKey, groupVotes] = groupEntry
       Object.entries(groupVotes).forEach((groupVoteEntry) => {
         const [, votesFromUser] = groupVoteEntry
@@ -62,12 +71,14 @@ const calculateGlobalScores = (
     })
   }
 
-  let mapped = Object.entries(scoreMap).map((scoreEntry) => {
-    const [name, votes] = scoreEntry
-    return { name, votes }
-  })
+  let countryVotes: CountryVotes[] = Object.entries(scoreMap).map(
+    (scoreEntry) => {
+      const [name, score] = scoreEntry
+      return { name, votes: score } as CountryVotes
+    },
+  )
 
-  return _.sortBy(mapped, (country) => {
-    return country.votes
-  }).reverse()
+  return countryVotes.sort((a, b) => {
+    return a.votes > b.votes ? -1 : 1
+  })
 }

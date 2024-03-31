@@ -1,56 +1,59 @@
 import React from 'react'
 import { CountryScore } from './CountryScore'
-import { Countries, Profile, Votes } from './MainView'
+import { Countries, GroupVotes, Profile, Votes } from './MainView'
 
 type LocalTableProps = {
-  profile: Profile
-  countries: Countries
-  votes: Votes
+  countries: string[]
+  currentGroupVotes: GroupVotes
   groupName: string
+  activeVote: string
 }
 
 export const ResultTableLocal = ({
-  profile,
   countries,
-  votes,
+  currentGroupVotes,
   groupName,
+  activeVote,
 }: LocalTableProps) => {
   const sortedLocalCountryScores = calculateLocalGroupScores(
-    profile,
     countries,
-    votes,
+    currentGroupVotes,
+    groupName,
+    activeVote,
   )
 
   return (
     <div className="column">
-      <h2 className="subtitle has-text-white">
-        Current point totals for{' '}
-        <strong className="has-text-white">YOUR</strong> voting group:{' '}
+      <h2 className="subtitle">
+        Current point totals for <strong>YOUR</strong> voting group:{' '}
         <span className="has-text-success">{groupName}</span>
       </h2>
-      {sortedLocalCountryScores.map((country: string, index: number) => (
+      {sortedLocalCountryScores.map((countryVotes, index: number) => (
         <div key={`countryscore-${index}`}>
-          <CountryScore country={country} index={index} />
+          <CountryScore countryVotes={countryVotes} index={index} />
         </div>
       ))}
     </div>
   )
 }
 
-const calculateLocalGroupScores = (profile, countries, votes) => {
-  const activeVote = countries.activeVote
-  const groupName = profile[activeVote].groupName
-
-  const countryScores = countries[activeVote]
+const calculateLocalGroupScores = (
+  countries: string[],
+  groupVotes: GroupVotes,
+  groupName: string,
+  activeVote: string,
+) => {
+  if (!countries || !activeVote || !groupVotes || !groupName) {
+    return []
+  }
+  const countryScores = countries
     .map((country) => {
       let voteScore = 0
 
-      for (const voter in votes?.[activeVote]?.[groupName]) {
-        const voterEntries = Object.entries(votes[activeVote][groupName][voter])
-
+      for (const voter in groupVotes) {
+        const voterEntries = Object.entries(groupVotes[voter])
         voterEntries.forEach((entry) => {
           const [voteValue, forCountry] = entry
-
           if (forCountry === country) {
             voteScore += parseInt(voteValue)
           }
@@ -61,9 +64,7 @@ const calculateLocalGroupScores = (profile, countries, votes) => {
     })
     .filter((score) => score)
 
-  return countryScores
-    .sort((country) => {
-      return country.votes
-    })
-    .reverse()
+  return countryScores.sort((a, b) => {
+    return a.votes > b.votes ? -1 : 1
+  })
 }

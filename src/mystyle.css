@@ -1,11 +1,3 @@
-.column {
-  padding: 0px;
-}
-
 .no-line-break {
   white-space: nowrap;
-}
-
-.field-label.is-normal {
-  width: 50%;
 }
