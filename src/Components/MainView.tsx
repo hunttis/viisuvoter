@@ -1,53 +1,19 @@
-import React, { Component, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ResultTableLocal } from './ResultTableLocal'
 import { ResultTableGlobal } from './ResultTableGlobal'
-
-import {
-  getAuth,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-} from 'firebase/auth'
+import { getAuth, GoogleAuthProvider, onAuthStateChanged } from 'firebase/auth'
 import { getDatabase, onValue, ref, set, update } from 'firebase/database'
 import { VoteScreen } from './VoteScreen'
-import { LandingPage } from './LandingPage'
+import { LoginPage } from './LoginPage'
 import { ChooseVotingGroupPage } from './ChooseVotingGroupPage'
-
-export type Profile = {
-  displayName: string
-  [key: string]: { groupName: string } | string
-}
-
-export type Countries = {
-  [key: number]: string
-}
-
-export type Votes = {
-  [key: string]: {
-    [key: string]: {
-      [key: string]: string
-    }
-  }
-}
-
-export type UserVotes = {
-  [key: number]: string
-}
-
-export type GroupVotes = {
-  [key: string]: {
-    [key: number]: string
-  }
-}
-
-export type GlobalVotes = {
-  [key: string]: GroupVotes
-}
+import { LoadingScreen } from './LoadingScreen'
+import { UserOptions } from './UserOptions'
+import { Countries, GroupVotes, Profile, UserVotes } from './Models'
 
 export const pointAmounts = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
 
 export const MainView = () => {
-  const provider = new GoogleAuthProvider()
+  const authProvider = new GoogleAuthProvider()
   const [groupName, setGroupName] = useState<string>('')
   const [activeGroupName, setActiveGroupName] = useState<string>('')
   const [countries, setCountries] = useState<Countries>([])
@@ -146,26 +112,6 @@ export const MainView = () => {
     return () => unsubscribe()
   }, [])
 
-  const loginGoogle = async () => {
-    const auth = getAuth()
-
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log('LOGIN: ', result)
-        const credential = GoogleAuthProvider.credentialFromResult(result)
-        const token = credential?.accessToken
-        const user = result.user
-        setProfile(user)
-        console.log('USER: ', user)
-      })
-      .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        const email = error.customData.email
-        const credential = GoogleAuthProvider.credentialFromError(error)
-      })
-  }
-
   const onSubmitGroupName = async () => {
     if (groupName) {
       const db = getDatabase()
@@ -176,90 +122,27 @@ export const MainView = () => {
     }
   }
 
-  const leaveVotingGroup = () => {
-    const db = getDatabase()
-    set(ref(db, `users/${uid}/${activeVote}/`), {
-      groupName: null,
-    })
-    setActiveGroupName('')
-  }
-
-  const logout = () => {
-    const auth = getAuth()
-    auth.signOut()
-    window.location.reload()
-  }
-
-  const vote = (points, country) => {
-    console.log('Voting for ', points, country)
-    let countryAlreadyHasVote = false
-    let whichPointsAlreadyHadVote: string | null = null
-
-    if (currentUserVotes) {
-      Object.entries(currentUserVotes).forEach(([points, country]) => {
-        if (country === country) {
-          countryAlreadyHasVote = true
-          whichPointsAlreadyHadVote = points
-        }
-      })
-    }
-
-    const db = getDatabase()
-
-    if (countryAlreadyHasVote) {
-      console.log('Updating vote')
-      console.log({
-        [points]: country,
-        [whichPointsAlreadyHadVote!]: null,
-      })
-      update(
-        ref(
-          db,
-          `votes/${activeVote}/${activeGroupName}/${profile.displayName}`,
-        ),
-        {
-          [points]: country,
-          [whichPointsAlreadyHadVote!]: null,
-        },
-      )
-    } else {
-      console.log('Adding new vote')
-      update(
-        ref(
-          db,
-          `votes/${activeVote}/${activeGroupName}/${profile.displayName}`,
-        ),
-        {
-          [points]: country,
-        },
-      )
-    }
-  }
-
-  console.log('currentUserVotes: ', currentUserVotes)
-  console.log('currentGroupVotes: ', currentGroupVotes)
-  console.log('globalVotes: ', globalVotes)
-  console.log('countries: ', countries)
+  // console.log('currentUserVotes: ', currentUserVotes)
+  // console.log('currentGroupVotes: ', currentGroupVotes)
+  // console.log('globalVotes: ', globalVotes)
+  // console.log('countries: ', countries)
 
   const auth = getAuth()
   const currentUser = auth.currentUser
 
-  const showLoading = !countries || !currentUser || !activeVote
   const showLogin = countries && !currentUser
   const showJoinGroup =
     countries && currentUser && activeVote && !activeGroupName
   const showVoting = countries && uid && activeGroupName && activeVote
 
+  const showLoading = !showLogin && !showJoinGroup && !showVoting
+
   return (
     <div>
-      {showLoading && (
-        <h1 className="title has-text-centered ">
-          <br />
-          <br />
-          <button className="button is-success is-loading">Loading</button>
-        </h1>
+      {showLoading && <LoadingScreen />}
+      {!showLoading && showLogin && (
+        <LoginPage authProvider={authProvider} setProfile={setProfile} />
       )}
-      {!showLoading && showLogin && <LandingPage loginGoogle={loginGoogle} />}
       {!showLoading && showJoinGroup && (
         <ChooseVotingGroupPage
           setGroupName={onChange}
@@ -272,7 +155,7 @@ export const MainView = () => {
             <VoteScreen
               countries={countries}
               currentUserVotes={currentUserVotes}
-              vote={vote}
+              profile={profile}
               activeVote={activeVote}
               activeGroupName={activeGroupName}
             />
@@ -295,21 +178,12 @@ export const MainView = () => {
           </div>
         </>
       )}
-      {!showLoading && (
-        <>
-          <button
-            className="button is-pulled-right is-warning is-outlined is-small"
-            onClick={() => leaveVotingGroup()}
-          >
-            Leave voting group
-          </button>
-          <button
-            className="button is-pulled-right is-danger is-outlined is-small"
-            onClick={() => logout()}
-          >
-            Log out
-          </button>
-        </>
+      {!showLoading && !showLogin && (
+        <UserOptions
+          uid={uid}
+          activeVote={activeVote}
+          setActiveGroupName={setActiveGroupName}
+        />
       )}
     </div>
   )

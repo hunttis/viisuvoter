@@ -1,7 +1,7 @@
 import React from 'react'
 import _ from 'lodash'
 import { CountryScore } from './CountryScore'
-import { Countries, GlobalVotes, Votes } from './MainView'
+import { GlobalVotes } from './Models'
 
 type GlobalTableProps = {
   countries: string[]

@@ -1,10 +1,12 @@
 import React from 'react'
-import { UserVotes, pointAmounts } from './MainView'
+import { pointAmounts } from './MainView'
+import { Profile, UserVotes } from './Models'
+import { getDatabase, ref, update } from 'firebase/database'
 
 type VoteScreenProps = {
   countries: string
   currentUserVotes: UserVotes[]
-  vote: (point: number, country: string) => void
+  profile: Profile
   activeVote: string
   activeGroupName: string
 }
@@ -12,12 +14,65 @@ type VoteScreenProps = {
 export const VoteScreen = ({
   countries,
   currentUserVotes,
-  vote,
+  profile,
   activeVote,
   activeGroupName,
 }: VoteScreenProps) => {
   if (!countries || !activeVote) {
     return <div>Votescreen not yet available</div>
+  }
+
+  const vote = (points, country) => {
+    console.log('Voting for ', points, country)
+    let countryAlreadyHasVote = false
+    let whichPointsAlreadyHadVote: string | null = null
+
+    if (currentUserVotes) {
+      Object.entries(currentUserVotes).forEach(
+        ([currentPoints, currentCountry]) => {
+          if (country === currentCountry) {
+            countryAlreadyHasVote = true
+            whichPointsAlreadyHadVote = currentPoints
+          }
+        },
+      )
+    }
+
+    const db = getDatabase()
+
+    if (countryAlreadyHasVote) {
+      console.log({
+        [points]: country,
+        [whichPointsAlreadyHadVote!]: null,
+      })
+      console.log('updating vote', {
+        [points]: country,
+        [whichPointsAlreadyHadVote!]: null,
+      })
+      update(
+        ref(
+          db,
+          `votes/${activeVote}/${activeGroupName}/${profile.displayName}`,
+        ),
+        {
+          [points]: country,
+          [whichPointsAlreadyHadVote!]: null,
+        },
+      )
+    } else {
+      console.log('Adding new vote', {
+        [points]: country,
+      })
+      update(
+        ref(
+          db,
+          `votes/${activeVote}/${activeGroupName}/${profile.displayName}`,
+        ),
+        {
+          [points]: country,
+        },
+      )
+    }
   }
 
   return (

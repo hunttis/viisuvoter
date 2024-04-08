@@ -1,6 +1,6 @@
 import React from 'react'
 import { CountryScore } from './CountryScore'
-import { Countries, GroupVotes, Profile, Votes } from './MainView'
+import { GroupVotes } from './Models'
 
 type LocalTableProps = {
   countries: string[]
