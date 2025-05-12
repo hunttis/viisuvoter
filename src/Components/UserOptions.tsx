@@ -1,36 +1,52 @@
-import { getAuth } from 'firebase/auth'
-import { getDatabase, ref, set } from 'firebase/database'
 import React from 'react'
+import { getAuth, signOut } from 'firebase/auth'
+import { Profile } from './Models'
 
-export const UserOptions = ({ uid, activeVote, setActiveGroupName }) => {
-  const leaveVotingGroup = () => {
-    const db = getDatabase()
-    set(ref(db, `users/${uid}/${activeVote}/`), {
-      groupName: null,
-    })
-    setActiveGroupName('')
-  }
+interface UserOptionsProps {
+  uid: string
+  activeVote: string
+  setActiveGroupName: (name: string) => void
+  profile: Profile
+}
 
-  const logout = () => {
-    const auth = getAuth()
-    auth.signOut()
-    window.location.reload()
-  }
+export const UserOptions = ({
+  uid,
+  activeVote,
+  setActiveGroupName,
+  profile,
+}: UserOptionsProps) => {
+  const auth = getAuth()
+  const userGroups = profile[activeVote]?.groupNames || []
 
   return (
-    <>
-      <button
-        className="button is-pulled-right is-warning is-outlined is-small"
-        onClick={() => leaveVotingGroup()}
-      >
-        Leave voting group
-      </button>
-      <button
-        className="button is-pulled-right is-danger is-outlined is-small"
-        onClick={() => logout()}
-      >
-        Log out
-      </button>
-    </>
+    <div className="navbar is-light">
+      <div className="navbar-brand">
+        <div className="navbar-item">
+          <div className="field">
+            <div className="control">
+              <div className="select">
+                <select
+                  value={profile[activeVote]?.groupNames?.[0] || ''}
+                  onChange={(e) => setActiveGroupName(e.target.value)}
+                >
+                  {userGroups.map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="navbar-end">
+        <div className="navbar-item">
+          <button className="button is-light" onClick={() => signOut(auth)}>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

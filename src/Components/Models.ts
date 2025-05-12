@@ -1,10 +1,25 @@
+export type VoteProfile = {
+  groupNames: string[]
+}
+
 export type Profile = {
+  uid: string
   displayName: string
-  [key: string]: { groupName: string } | string
+  photoURL: string
+  isAdmin: boolean
+  groups: {
+    groupNames: Record<string, string>
+  }
+  '2024-final'?: {
+    groupNames: string[]
+  }
+  eurovision?: {
+    groupNames: string[]
+  }
 }
 
 export type Countries = {
-  [key: number]: string
+  [key: string]: string // number -> country name
 }
 
 export type Votes = {
@@ -16,15 +31,13 @@ export type Votes = {
 }
 
 export type UserVotes = {
-  [key: number]: string
+  [key: string]: string // points -> country
 }
 
 export type GroupVotes = {
-  [key: string]: {
-    [key: number]: string
-  }
+  [key: string]: UserVotes // username -> votes
 }
 
 export type GlobalVotes = {
-  [key: string]: GroupVotes
+  [key: string]: GroupVotes // group -> votes
 }

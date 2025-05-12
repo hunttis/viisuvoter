@@ -1,25 +1,41 @@
 {
   "rules": {
+    "activeEvent": {
+      ".read": "auth != null",
+      ".write": "root.child('users').child(auth.uid).child('isAdmin').val() === true"
+    },
     "countries": {
       ".read": "true"
     },
     "users": {
-      "$userid": {
-        ".read": "(auth != null && auth.uid == $userid)",
-        ".write": "(auth != null && auth.uid == $userid)"
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid",
+        "groups": {
+          "groupNames": {
+            ".read": "auth != null",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
       }
     },
     "votes": {
-      "$currentYear": {
-        "$groupName": {
-          "$userid": {
-            ".read": "true",
-            ".write": "(auth != null && auth.uid == $userid)"
-          }
+      "$eventId": {
+        "$userId": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid === $userId"
         }
-      },
-      ".read": "true",
-      ".write": "true"
+      }
+    },
+    "votingEvents": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+    },
+    "groups": {
+      ".read": "auth != null",
+      "$groupId": {
+        ".write": "auth != null && (!data.exists() || data.child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+      }
     }
   }
 }
