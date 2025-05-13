@@ -161,37 +161,52 @@ export const VoteScreen = ({
             </tr>
           </thead>
           <tbody>
-            {countries.map((country) => (
-              <tr key={country} data-testid={`country-row-${country}`}>
-                <td>{country}</td>
-                <td>
-                  <div className="buttons are-small">
-                    {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => (
-                      <button
-                        key={points}
-                        data-testid={`vote-btn-${country}-${points}`}
-                        className={`button ${
-                          currentUserVotes[country] === points
-                            ? 'is-primary'
-                            : 'is-light'
-                        }`}
-                        onClick={() => {
-                          const newVotes = { ...currentUserVotes }
-                          if (currentUserVotes[country] === points) {
-                            delete newVotes[country]
-                          } else {
-                            newVotes[country] = points
-                          }
-                          setCurrentUserVotes(newVotes)
-                        }}
-                      >
-                        {points}
-                      </button>
-                    ))}
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {countries.map((country) => {
+              // Check if this country has already been voted (by this user)
+              const countryVoted = currentUserVotes.hasOwnProperty(country)
+              return (
+                <tr key={country} data-testid={`country-row-${country}`}>
+                  <td>{country}</td>
+                  <td>
+                    <div className="buttons are-small">
+                      {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => {
+                        // Check if this score has already been used for another country
+                        const scoreUsed = Object.entries(currentUserVotes).some(
+                          ([c, p]) => c !== country && p === points,
+                        )
+                        // Disable if this score is already used elsewhere, or if this country is already voted and this is not the selected score
+                        const isSelected = currentUserVotes[country] === points
+                        const disabled =
+                          (!isSelected && scoreUsed) ||
+                          (countryVoted && !isSelected)
+                        return (
+                          <button
+                            key={points}
+                            data-testid={`vote-btn-${country}-${points}`}
+                            className={`button ${
+                              isSelected ? 'is-primary' : 'is-light'
+                            }`}
+                            disabled={disabled}
+                            onClick={() => {
+                              if (disabled) return
+                              const newVotes = { ...currentUserVotes }
+                              if (isSelected) {
+                                delete newVotes[country]
+                              } else {
+                                newVotes[country] = points
+                              }
+                              setCurrentUserVotes(newVotes)
+                            }}
+                          >
+                            {points}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
