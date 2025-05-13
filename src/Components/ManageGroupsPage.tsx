@@ -324,7 +324,7 @@ export const ManageGroupsPage = ({
                     </button>
                   </header>
                   <div className="card-content">
-                    <div className="buttons are-small">
+                    <div className="buttons">
                       {isMember ? (
                         <div className="button-group">
                           <button

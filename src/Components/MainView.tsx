@@ -365,8 +365,43 @@ export const MainView = () => {
     })
   }
 
+  // Buttons component for top right actions
+  interface TopRightButtonsProps {
+    profile: Profile | null
+    setShowAdmin: React.Dispatch<React.SetStateAction<boolean>>
+    setShowManageGroups: React.Dispatch<React.SetStateAction<boolean>>
+    logout: () => void
+  }
+
+  const TopRightButtons: React.FC<TopRightButtonsProps> = ({
+    profile,
+    setShowAdmin,
+    setShowManageGroups,
+    logout,
+  }) => (
+    <div className="buttons">
+      {profile?.isAdmin && (
+        <button
+          className="button is-primary"
+          onClick={() => setShowAdmin(true)}
+        >
+          Admin Panel
+        </button>
+      )}
+      <button
+        className="button is-info"
+        onClick={() => setShowManageGroups(true)}
+      >
+        Manage Groups
+      </button>
+      <button className="button is-light" onClick={logout}>
+        Logout
+      </button>
+    </div>
+  )
+
   return (
-    <div className="container p-4">
+    <div style={{ padding: '16px' }}>
       {showLoading ? (
         <div className="has-text-centered">
           <p className="is-size-4">Loading...</p>
@@ -388,25 +423,12 @@ export const MainView = () => {
               <h1 className="title">Eurovision Voter</h1>
             </div>
             <div className="level-right">
-              <div className="buttons">
-                {profile?.isAdmin && (
-                  <button
-                    className="button is-primary"
-                    onClick={() => setShowAdmin(true)}
-                  >
-                    Admin Panel
-                  </button>
-                )}
-                <button
-                  className="button is-info"
-                  onClick={() => setShowManageGroups(true)}
-                >
-                  Manage Groups
-                </button>
-                <button className="button is-light" onClick={logout}>
-                  Logout
-                </button>
-              </div>
+              <TopRightButtons
+                profile={profile}
+                setShowAdmin={setShowAdmin}
+                setShowManageGroups={setShowManageGroups}
+                logout={logout}
+              />
             </div>
           </div>
 
