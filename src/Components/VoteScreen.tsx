@@ -171,32 +171,41 @@ export const VoteScreen = ({
                     <div className="buttons are-small">
                       {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => {
                         const isSelected = currentUserVotes[country] === points
-                        // Score is already used for another country
-                        const scoreUsedElsewhere = Object.entries(
-                          currentUserVotes,
-                        ).some(([c, p]) => c !== country && p === points)
-                        // This country already has a score (any score)
                         const countryHasScore =
                           typeof currentUserVotes[country] === 'number'
-                        // Button should be dark if score is used elsewhere, or if this country has a score and this is not the selected score
-                        const isDark =
-                          (scoreUsedElsewhere && !isSelected) ||
-                          (countryHasScore && !isSelected)
+                        const scoreUsedElsewhere = Object.entries(currentUserVotes).some(
+                          ([c, p]) => c !== country && p === points
+                        )
+                        let btnClass = 'button '
+                        if (isSelected) {
+                          btnClass += 'is-primary'
+                        } else if (countryHasScore) {
+                          btnClass += 'is-dark'
+                        } else if (scoreUsedElsewhere) {
+                          btnClass += 'is-dark'
+                        } else {
+                          btnClass += 'is-info is-outlined'
+                        }
                         return (
                           <button
                             key={points}
                             data-testid={`vote-btn-${country}-${points}`}
-                            className={`button ${isSelected ? 'is-primary' : isDark ? 'is-dark' : 'is-light'}`}
+                            className={btnClass}
                             onClick={() => {
-                              // Remove this score from any other country
                               const newVotes = { ...currentUserVotes }
-                              Object.entries(newVotes).forEach(([c, p]) => {
-                                if (c !== country && p === points) {
-                                  delete newVotes[c]
-                                }
-                              })
-                              // Set this score for this country
-                              newVotes[country] = points
+                              if (isSelected) {
+                                // Remove the vote for this country
+                                delete newVotes[country]
+                              } else {
+                                // Remove this score from any other country
+                                Object.entries(newVotes).forEach(([c, p]) => {
+                                  if (c !== country && p === points) {
+                                    delete newVotes[c]
+                                  }
+                                })
+                                // Set this score for this country
+                                newVotes[country] = points
+                              }
                               setCurrentUserVotes(newVotes)
                             }}
                           >
