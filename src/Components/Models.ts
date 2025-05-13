@@ -18,10 +18,6 @@ export type Profile = {
   }
 }
 
-export type Countries = {
-  [key: string]: string // number -> country name
-}
-
 export type Votes = {
   [key: string]: {
     [key: string]: {
@@ -31,13 +27,17 @@ export type Votes = {
 }
 
 export type UserVotes = {
-  [key: string]: string // points -> country
+  [country: string]: number // country -> points
 }
 
 export type GroupVotes = {
-  [key: string]: UserVotes // username -> votes
+  [groupName: string]: {
+    [userId: string]: UserVotes
+  }
 }
 
 export type GlobalVotes = {
-  [key: string]: GroupVotes // group -> votes
+  [groupName: string]: {
+    [userId: string]: UserVotes
+  }
 }

@@ -1,0 +1,90 @@
+{
+  "activeEvent": "Eurovision 2025 - Semifinal 1",
+  "activeVote": "Eurovision 2025 - Semifinal 1",
+  "groups": {
+    "-OLxIR0QudG12Es-S7Le": {
+      "createdBy": "Mc4F2pspu5NJ8InMzmwx4A5i7wq1",
+      "members": {
+        "Mc4F2pspu5NJ8InMzmwx4A5i7wq1": true
+      },
+      "name": "Wuffice"
+    }
+  },
+  "users": {
+    "Mc4F2pspu5NJ8InMzmwx4A5i7wq1": {
+      "displayName": "Ville Nuutinen",
+      "groups": {
+        "groupNames": {
+          "-OLxIR0QudG12Es-S7Le": "Wuffice"
+        }
+      },
+      "isAdmin": true,
+      "photoURL": "https://lh4.googleusercontent.com/-zigCKq1_GP0/AAAAAAAAAAI/AAAAAAAAAjw/PUAf85m_two/photo.jpg",
+      "uid": "Mc4F2pspu5NJ8InMzmwx4A5i7wq1"
+    }
+  },
+  "votes": {
+    "Eurovision 2025 - Semifinal 1": {
+      "Mc4F2pspu5NJ8InMzmwx4A5i7wq1": {
+        "Albania": 3,
+        "Azerbaijan": 2,
+        "Belgium": 7,
+        "Croatia": 5,
+        "Cyprus": 8,
+        "Estonia": 3,
+        "Iceland": 10,
+        "Poland": 7,
+        "San Marino": 8,
+        "Slovenia": 5
+      }
+    }
+  },
+  "votingEvents": {
+    "Eurovision 2025 - Semifinal 1": {
+      "countries": [
+        "Sweden",
+        "Ukraine",
+        "Slovenia",
+        "Iceland",
+        "Estonia",
+        "Poland",
+        "Portugal",
+        "Netherlands",
+        "Azerbaijan",
+        "Albania",
+        "San Marino",
+        "Belgium",
+        "Cyprus",
+        "Croatia",
+        "Norway"
+      ],
+      "id": "Eurovision 2025 - Semifinal 1",
+      "name": "Eurovision 2025 - Semifinal 1"
+    },
+    "Eurovision 2025 - Semifinal 2": {
+      "countries": [
+        "Austria",
+        "Lithuania",
+        "Armenia",
+        "Montenegro",
+        "Greece",
+        "Ireland",
+        "Australia",
+        "Latvia",
+        "Czechia",
+        "Israel",
+        "Malta",
+        "Finland",
+        "Denmark",
+        "Luxembourg",
+        "Georgia",
+        "Serbia"
+      ],
+      "id": "Eurovision 2025 - Semifinal 2",
+      "name": "Eurovision 2025 - Semifinal 2"
+    },
+    "Foofer": {
+      "name": "Foofer"
+    }
+  }
+}

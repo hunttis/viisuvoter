@@ -4,9 +4,12 @@ import '@testing-library/jest-dom'
 import { VoteScreen } from '../VoteScreen'
 import { onValue, set } from 'firebase/database'
 import { Profile } from '../Models'
+import { ResultTableLocal } from '../ResultTableLocal'
 
 // Mock Firebase
 jest.mock('firebase/database', () => ({
+  getDatabase: jest.fn(() => ({})),
+  ref: jest.fn((db, path) => ({ path })),
   onValue: jest.fn(),
   set: jest.fn(),
 }))
@@ -18,7 +21,7 @@ const mockProfile: Profile = {
   photoURL: 'https://example.com/photo.jpg',
   isAdmin: false,
   groups: {
-    groupNames: ['Test Group'],
+    groupNames: { 'Test Group': 'Test Group' },
   },
 }
 
@@ -26,190 +29,195 @@ const mockCountries = ['Finland', 'Sweden', 'Norway']
 
 const mockVotes = {
   'test-uid': {
-    Finland: '12',
-    Sweden: '10',
-    Norway: '8',
+    Finland: 12,
+    Sweden: 10,
+    Norway: 8,
+  },
+  'other-user': {
+    Finland: 10,
+    Sweden: 12,
+    Norway: 8,
   },
 }
 
-describe('VoteScreen', () => {
-  beforeEach(() => {
-    // Reset all mocks before each test
-    jest.clearAllMocks()
+const mockGroups = {
+  'group-1': {
+    name: 'Test Group',
+    members: {
+      'test-uid': true,
+      'other-user': true,
+    },
+  },
+}
 
-    // Mock database listeners
+const mockUsers = {
+  'test-uid': { displayName: 'Test User' },
+  'other-user': { displayName: 'Other User' },
+}
+
+// Remove all previous tests and write new ones for the Eurovision voting screen
+
+describe('VoteScreen (Eurovision voting)', () => {
+  const mockProfile = {
+    uid: 'user1',
+    displayName: 'Eurofan',
+    photoURL: '',
+    isAdmin: false,
+    groups: { groupNames: { 'Euro Group': 'Euro Group' } },
+  }
+  const mockCountries = ['Finland', 'Sweden', 'Norway']
+  const mockVotes = {
+    user1: { Finland: 12, Sweden: 10, Norway: 8 },
+    user2: { Finland: 10, Sweden: 12, Norway: 8 },
+  }
+  const mockGroups = {
+    'group-1': {
+      name: 'Euro Group',
+      members: { user1: true, user2: true },
+    },
+  }
+  const mockUsers = {
+    user1: { displayName: 'Eurofan' },
+    user2: { displayName: 'Otherfan' },
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
     const mockUnsubscribe = jest.fn()
     ;(onValue as jest.Mock).mockImplementation((ref, callback) => {
-      if (ref.path.includes('countries')) {
-        callback({ val: () => mockCountries })
-      } else if (ref.path.includes('votes')) {
-        callback({ val: () => mockVotes })
-      }
+      let valFn: () => any = () => undefined
+      if (ref.path.includes('countries')) valFn = () => mockCountries
+      else if (ref.path.includes('votes')) valFn = () => mockVotes
+      else if (ref.path.includes('groups')) valFn = () => mockGroups
+      else if (ref.path.includes('users')) valFn = () => mockUsers
+      callback({
+        val: valFn,
+        exists: () => {
+          const value = valFn()
+          if (value === undefined || value === null) return false
+          if (Array.isArray(value)) return value.length > 0
+          if (typeof value === 'object') return Object.keys(value).length > 0
+          return !!value
+        },
+      })
       return mockUnsubscribe
     })
   })
 
-  it('renders the voting table with countries', () => {
+  it('renders all Eurovision countries and voting buttons', () => {
     render(
       <VoteScreen
-        profile={mockProfile}
+        profile={mockProfile as any}
         activeEvent="eurovision"
-        activeGroupName="Test Group"
+        activeGroupName="Euro Group"
         setActiveGroupName={() => {}}
       />,
     )
-
-    // Check if all countries are rendered
     mockCountries.forEach((country) => {
-      expect(screen.getByText(country)).toBeInTheDocument()
-    })
-
-    // Check if voting buttons are rendered
-    const pointAmounts = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
-    pointAmounts.forEach((points) => {
-      expect(screen.getByText(points.toString())).toBeInTheDocument()
+      expect(screen.getByTestId(`country-row-${country}`)).toBeInTheDocument()
+      ;[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].forEach((points) => {
+        expect(
+          screen.getByTestId(`vote-btn-${country}-${points}`),
+        ).toBeInTheDocument()
+      })
     })
   })
 
-  it('displays current user votes correctly', () => {
+  it('highlights the user’s current votes', () => {
     render(
       <VoteScreen
-        profile={mockProfile}
+        profile={mockProfile as any}
         activeEvent="eurovision"
-        activeGroupName="Test Group"
+        activeGroupName="Euro Group"
         setActiveGroupName={() => {}}
       />,
     )
-
-    // Check if voted scores are highlighted
-    expect(screen.getByText('12')).toHaveClass('is-primary')
-    expect(screen.getByText('10')).toHaveClass('is-primary')
-    expect(screen.getByText('8')).toHaveClass('is-primary')
+    expect(screen.getByTestId('vote-btn-Finland-12')).toHaveClass('is-primary')
+    expect(screen.getByTestId('vote-btn-Sweden-10')).toHaveClass('is-primary')
+    expect(screen.getByTestId('vote-btn-Norway-8')).toHaveClass('is-primary')
   })
 
-  it('displays group votes correctly', async () => {
-    render(
-      <VoteScreen
-        profile={mockProfile}
-        activeEvent="eurovision"
-        activeGroupName="Test Group"
-        setActiveGroupName={() => {}}
-      />,
-    )
-
-    // Wait for group votes to be loaded
-    await waitFor(() => {
-      expect(screen.getByText('Group Results')).toBeInTheDocument()
-    })
-
-    // Check if group votes are displayed
-    expect(screen.getByText('Finland')).toBeInTheDocument()
-    expect(screen.getByText('12')).toBeInTheDocument()
-  })
-
-  it('displays global votes correctly', async () => {
-    render(
-      <VoteScreen
-        profile={mockProfile}
-        activeEvent="eurovision"
-        activeGroupName="Test Group"
-        setActiveGroupName={() => {}}
-      />,
-    )
-
-    // Wait for global votes to be loaded
-    await waitFor(() => {
-      expect(screen.getByText('Global Results')).toBeInTheDocument()
-    })
-
-    // Check if global votes are displayed
-    expect(screen.getByText('Finland')).toBeInTheDocument()
-    expect(screen.getByText('12')).toBeInTheDocument()
-  })
-
-  it('handles vote submission correctly', async () => {
+  it('lets the user change their vote and saves it', async () => {
     const mockSet = jest.fn()
     ;(set as jest.Mock).mockImplementation(mockSet)
-
     render(
       <VoteScreen
-        profile={mockProfile}
+        profile={mockProfile as any}
         activeEvent="eurovision"
-        activeGroupName="Test Group"
+        activeGroupName="Euro Group"
         setActiveGroupName={() => {}}
       />,
     )
-
-    // Find and click a voting button
-    const voteButton = screen.getByText('12')
-    fireEvent.click(voteButton)
-
-    // Check if the vote was saved to the database
+    const btn = screen.getByTestId('vote-btn-Finland-10')
+    fireEvent.click(btn)
     await waitFor(() => {
       expect(mockSet).toHaveBeenCalled()
     })
   })
 
-  it('displays loading state while fetching data', () => {
+  it('shows group and global results sections', async () => {
     render(
       <VoteScreen
-        profile={mockProfile}
+        profile={mockProfile as any}
         activeEvent="eurovision"
-        activeGroupName="Test Group"
+        activeGroupName="Euro Group"
         setActiveGroupName={() => {}}
       />,
     )
-
-    // Initially, the loading state should be shown
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByTestId('group-section-Euro Group')).toBeInTheDocument()
+      expect(screen.getByTestId('global-results')).toBeInTheDocument()
+    })
   })
 
-  it('handles empty countries list', () => {
-    // Mock empty countries list
+  it('renders no countries if the list is empty', async () => {
     ;(onValue as jest.Mock).mockImplementation((ref, callback) => {
-      if (ref.path.includes('countries')) {
-        callback({ val: () => [] })
-      } else if (ref.path.includes('votes')) {
-        callback({ val: () => mockVotes })
-      }
+      let valFn: () => any = () => undefined
+      if (ref.path.includes('countries')) valFn = () => []
+      else if (ref.path.includes('votes')) valFn = () => mockVotes
+      else if (ref.path.includes('groups')) valFn = () => mockGroups
+      else if (ref.path.includes('users')) valFn = () => mockUsers
+      callback({
+        val: valFn,
+        exists: () => false,
+      })
       return jest.fn()
     })
-
     render(
       <VoteScreen
-        profile={mockProfile}
+        profile={mockProfile as any}
         activeEvent="eurovision"
-        activeGroupName="Test Group"
+        activeGroupName="Euro Group"
         setActiveGroupName={() => {}}
       />,
     )
-
-    // Check if appropriate message is shown
-    expect(screen.getByText('No countries available')).toBeInTheDocument()
+    expect(screen.queryByTestId('country-row-Finland')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('country-row-Sweden')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('country-row-Norway')).not.toBeInTheDocument()
   })
 
-  it('handles empty votes data', () => {
-    // Mock empty votes data
-    ;(onValue as jest.Mock).mockImplementation((ref, callback) => {
-      if (ref.path.includes('countries')) {
-        callback({ val: () => mockCountries })
-      } else if (ref.path.includes('votes')) {
-        callback({ val: () => {} })
-      }
-      return jest.fn()
-    })
-
+  it('renders ResultTableLocal with and it has scores that are not zero', () => {
     render(
-      <VoteScreen
-        profile={mockProfile}
-        activeEvent="eurovision"
-        activeGroupName="Test Group"
-        setActiveGroupName={() => {}}
+      <ResultTableLocal
+        countries={mockCountries}
+        currentGroupVotes={mockVotes}
+        groupName="Euro Group"
+        activeVote="eurovision"
       />,
     )
-
-    // Check if empty state is handled correctly
-    expect(screen.getByText('Group Results')).toBeInTheDocument()
-    expect(screen.getByText('Global Results')).toBeInTheDocument()
+    expect(screen.getByTestId('group-subtitle')).toBeInTheDocument()
+    expect(screen.getByTestId('group-name')).toHaveTextContent('Euro Group')
+    mockCountries.forEach((country) => {
+      expect(screen.getByTestId(`country-score-${country}`)).toBeInTheDocument()
+    })
+    expect(screen.getByTestId('country-score-Finland')).toHaveTextContent(
+      'Finland - 22',
+    )
+    expect(screen.getByTestId('country-score-Sweden')).toHaveTextContent(
+      'Sweden - 22',
+    )
+    expect(screen.getByTestId('country-score-Norway')).toHaveTextContent(
+      'Norway - 16',
+    )
   })
 })

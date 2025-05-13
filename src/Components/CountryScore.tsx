@@ -1,10 +1,21 @@
 import React from 'react'
 
+type CountryVotes = {
+  name: string
+  votes: number
+}
+
+type CountryScoreProps = {
+  countryVotes: CountryVotes
+  index: number
+  additionalStyles?: string
+}
+
 export const CountryScore = ({
   countryVotes,
   index,
   additionalStyles = '',
-}) => {
+}: CountryScoreProps) => {
   // console.log('CountryScore', country, index, additionalStyles)
   let color = ''
   switch (index) {
@@ -31,7 +42,10 @@ export const CountryScore = ({
   let size = 'is-4'
   let fontSize = 'is-small'
   return (
-    <div className={`${size} ${color} ${additionalStyles}`}>
+    <div
+      className={`${size} ${color} ${additionalStyles}`}
+      data-testid="country-score"
+    >
       <div className={`is-fullwidth is-outlined ${color} ${fontSize}`}>
         {index + 1}.&nbsp;{countryVotes.name}
         &nbsp;-&nbsp;{countryVotes.votes}

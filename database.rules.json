@@ -34,7 +34,20 @@
     "groups": {
       ".read": "auth != null",
       "$groupId": {
-        ".write": "auth != null && (!data.exists() || data.child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        "name": {
+          ".read": "auth != null",
+          ".write": "auth != null && (!data.exists() || root.child('groups').child($groupId).child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+        },
+        "members": {
+          ".read": "auth != null",
+          ".write": "auth != null && (!data.exists() || root.child('groups').child($groupId).child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+        },
+        "createdBy": {
+          ".read": "auth != null",
+          ".write": "auth != null && (!data.exists() || root.child('groups').child($groupId).child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+        }
       }
     }
   }

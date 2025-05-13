@@ -235,6 +235,34 @@ export const MainView = () => {
     }
   }, [profile, activeEvent])
 
+  useEffect(() => {
+    if (!profile || !activeGroupName) return
+
+    const db = getDatabase()
+    const groupVotesRef = ref(db, `votes/${activeGroupName}`)
+
+    onValue(groupVotesRef, (snapshot) => {
+      const data = snapshot.val()
+      if (data) {
+        const groupScores: Record<string, number> = {}
+
+        // Aggregate votes for each country
+        Object.values(data).forEach((userVotes: any) => {
+          Object.entries(userVotes).forEach(
+            ([country, voteValue]: [string, any]) => {
+              groupScores[country] =
+                (groupScores[country] || 0) + parseInt(voteValue, 10)
+            },
+          )
+        })
+
+        setCurrentGroupVotes(groupScores)
+      } else {
+        setCurrentGroupVotes({})
+      }
+    })
+  }, [profile, activeGroupName])
+
   const loadActiveEvent = async () => {
     try {
       const db = getDatabase()

@@ -50,7 +50,7 @@ const calculateGlobalScores = (
   globalVotes: GlobalVotes,
   activeVote: string,
 ) => {
-  let scoreMap = {}
+  let scoreMap: Record<string, number> = {}
 
   countries
     .filter((country) => country)

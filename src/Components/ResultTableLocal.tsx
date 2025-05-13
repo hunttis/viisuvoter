@@ -1,10 +1,10 @@
 import React from 'react'
 import { CountryScore } from './CountryScore'
-import { GroupVotes } from './Models'
+import { UserVotes } from './Models'
 
 type LocalTableProps = {
   countries: string[]
-  currentGroupVotes: GroupVotes
+  currentGroupVotes: { [userId: string]: UserVotes }
   groupName: string
   activeVote: string
 }
@@ -24,12 +24,17 @@ export const ResultTableLocal = ({
 
   return (
     <div className="column">
-      <h2 className="subtitle">
+      <h2 className="subtitle" data-testid="group-subtitle">
         Current point totals for <strong>YOUR</strong> voting group:{' '}
-        <span className="has-text-success">{groupName}</span>
+        <span className="has-text-success" data-testid="group-name">
+          {groupName}
+        </span>
       </h2>
       {sortedLocalCountryScores.map((countryVotes, index: number) => (
-        <div key={`countryscore-${index}`}>
+        <div
+          key={`countryscore-${index}`}
+          data-testid={`country-score-${countryVotes.name}`}
+        >
           <CountryScore countryVotes={countryVotes} index={index} />
         </div>
       ))}
@@ -39,32 +44,27 @@ export const ResultTableLocal = ({
 
 const calculateLocalGroupScores = (
   countries: string[],
-  groupVotes: GroupVotes,
+  groupVotes: { [userId: string]: UserVotes },
   groupName: string,
   activeVote: string,
 ) => {
   if (!countries || !activeVote || !groupVotes || !groupName) {
     return []
   }
-  const countryScores = countries
-    .map((country) => {
-      let voteScore = 0
 
-      for (const voter in groupVotes) {
-        const voterEntries = Object.entries(groupVotes[voter])
-        voterEntries.forEach((entry) => {
-          const [voteValue, forCountry] = entry
-          if (forCountry === country) {
-            voteScore += parseInt(voteValue)
-          }
-        })
+  const countryScores = countries.map((country) => {
+    let voteScore = 0
+
+    for (const voter in groupVotes) {
+      const votesByUser = groupVotes[voter] || {}
+      if (typeof votesByUser[country] === 'number') {
+        voteScore += votesByUser[country]
       }
+    }
 
-      return { name: country, votes: voteScore }
-    })
-    .filter((score) => score)
-
-  return countryScores.sort((a, b) => {
-    return a.votes > b.votes ? -1 : 1
+    return { name: country, votes: voteScore }
   })
+
+  // Sort by descending votes
+  return countryScores.sort((a, b) => b.votes - a.votes)
 }

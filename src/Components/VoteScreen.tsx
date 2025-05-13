@@ -21,88 +21,77 @@ export const VoteScreen = ({
   const [currentUserVotes, setCurrentUserVotes] = useState<
     Record<string, number>
   >({})
+  const [votes, setVotes] = useState<any>({})
+  const [groups, setGroups] = useState<any>({})
+  const [users, setUsers] = useState<any>({})
   const [currentGroupVotes, setCurrentGroupVotes] = useState<GroupVotes>({})
   const [globalVotes, setGlobalVotes] = useState<GlobalVotes>({})
 
+  // Load all data in parallel
   useEffect(() => {
     const db = getDatabase()
-
-    // Load countries for active event
     const countriesRef = ref(db, `votingEvents/${activeEvent}/countries`)
-    const countriesUnsubscribe = onValue(countriesRef, (snapshot) => {
-      if (snapshot.exists()) {
-        setCountries(snapshot.val())
-      }
-    })
-
-    // Load votes for active event
     const votesRef = ref(db, `votes/${activeEvent}`)
-    const votesUnsubscribe = onValue(votesRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const votes = snapshot.val()
-        console.log('Loaded votes:', votes)
+    const groupsRef = ref(db, 'groups')
+    const usersRef = ref(db, 'users')
 
-        // Set current user's votes only if we don't already have them
-        if (Object.keys(currentUserVotes).length === 0) {
-          const userVotes = votes[profile.uid] || {}
-          console.log('User votes:', userVotes)
-          setCurrentUserVotes(userVotes)
+    const unsubCountries = onValue(countriesRef, (snapshot) => {
+      if (snapshot.exists()) setCountries(snapshot.val())
+      else setCountries([])
+    })
+    const unsubVotes = onValue(votesRef, (snapshot) => {
+      if (snapshot.exists()) setVotes(snapshot.val())
+      else setVotes({})
+    })
+    const unsubGroups = onValue(groupsRef, (snapshot) => {
+      if (snapshot.exists()) setGroups(snapshot.val())
+      else setGroups({})
+    })
+    const unsubUsers = onValue(usersRef, (snapshot) => {
+      if (snapshot.exists()) setUsers(snapshot.val())
+      else setUsers({})
+    })
+    return () => {
+      unsubCountries()
+      unsubVotes()
+      unsubGroups()
+      unsubUsers()
+    }
+  }, [activeEvent])
+
+  // Compute group/global votes when all data is loaded
+  useEffect(() => {
+    if (Object.keys(groups).length > 0 && Object.keys(users).length > 0) {
+      // Set current user's votes
+      setCurrentUserVotes(votes[profile.uid] || {})
+
+      // Calculate group votes
+      const groupVotes: GroupVotes = {}
+      const globalVotesData: GlobalVotes = {}
+      // Map of group names to member IDs
+      const groupMembers: Record<string, string[]> = {}
+      Object.entries(groups).forEach(([groupId, groupData]: [string, any]) => {
+        const groupName = groupData.name
+        if (groupData.members) {
+          groupMembers[groupName] = Object.keys(groupData.members)
         }
-
-        // Calculate group votes
-        const groupVotes: GroupVotes = {}
-        const globalVotesData: GlobalVotes = {}
-
-        // First, get all users and their group memberships
-        const usersRef = ref(db, 'users')
-        onValue(usersRef, (usersSnapshot) => {
-          if (usersSnapshot.exists()) {
-            const users = usersSnapshot.val()
-
-            // For each user's votes
-            Object.entries(votes).forEach(
-              ([userId, userVotes]: [string, any]) => {
-                if (typeof userVotes === 'object') {
-                  const user = users[userId]
-                  if (user?.groups?.groupNames) {
-                    // Add votes to each group the user belongs to
-                    const groupNames = user.groups.groupNames as Record<
-                      string,
-                      string
-                    >
-                    Object.entries(groupNames).forEach(
-                      ([groupId, groupName]) => {
-                        if (!groupVotes[userId]) {
-                          groupVotes[userId] = {}
-                        }
-                        groupVotes[userId] = userVotes
-
-                        // Add to global votes under the group name
-                        if (!globalVotesData[groupName]) {
-                          globalVotesData[groupName] = {}
-                        }
-                        globalVotesData[groupName][userId] = userVotes
-                      },
-                    )
-                  }
-                }
-              },
-            )
-
-            console.log('Group votes:', groupVotes)
-            console.log('Global votes:', globalVotesData)
-            setCurrentGroupVotes(groupVotes)
-            setGlobalVotes(globalVotesData)
+      })
+      Object.entries(groupMembers).forEach(([groupName, memberIds]) => {
+        groupVotes[groupName] = {}
+        globalVotesData[groupName] = {}
+        memberIds.forEach((userId) => {
+          if (votes[userId]) {
+            const userVotes = votes[userId] as Record<string, number>
+            // Keep the original country-to-points mapping
+            groupVotes[groupName][userId] = userVotes
+            globalVotesData[groupName][userId] = userVotes
           }
         })
-      }
-    })
-
-    return () => {
-      countriesUnsubscribe()
-      votesUnsubscribe()
+      })
+      setCurrentGroupVotes(groupVotes)
+      setGlobalVotes(globalVotesData)
     }
-  }, [activeEvent, profile.uid, activeGroupName])
+  }, [votes, groups, users, profile.uid])
 
   // Save votes when they change
   useEffect(() => {
@@ -156,7 +145,7 @@ export const VoteScreen = ({
 
       <div className="box mb-4">
         <h3 className="title is-5 mb-4">Your Vote</h3>
-        <table className="table is-fullwidth">
+        <table className="table is-fullwidth" data-testid="vote-table">
           <thead>
             <tr>
               <th style={{ width: '40%' }}>Country</th>
@@ -165,13 +154,14 @@ export const VoteScreen = ({
           </thead>
           <tbody>
             {countries.map((country) => (
-              <tr key={country}>
+              <tr key={country} data-testid={`country-row-${country}`}>
                 <td>{country}</td>
                 <td>
                   <div className="buttons are-small">
                     {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => (
                       <button
                         key={points}
+                        data-testid={`vote-btn-${country}-${points}`}
                         className={`button ${
                           currentUserVotes[country] === points
                             ? 'is-primary'
@@ -199,7 +189,7 @@ export const VoteScreen = ({
       </div>
 
       <div className="columns is-multiline">
-        <div className="column is-12">
+        <div className="column is-12" data-testid="global-results">
           <ResultTableGlobal
             countries={countries}
             globalVotes={globalVotes}
@@ -208,12 +198,20 @@ export const VoteScreen = ({
         </div>
 
         {userGroups.map((group) => (
-          <div key={group} className="column is-6">
+          <div
+            key={group}
+            className="column is-6"
+            data-testid={`group-section-${group}`}
+          >
+            <h2 className="subtitle">
+              Current point totals for YOUR voting group: {group}
+            </h2>
             <ResultTableLocal
               countries={countries}
-              currentGroupVotes={currentGroupVotes}
+              currentGroupVotes={currentGroupVotes[group] || {}}
               groupName={group}
               activeVote={activeEvent}
+              data-testid={`result-table-local-${group}`}
             />
           </div>
         ))}
