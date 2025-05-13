@@ -4,8 +4,42 @@
       ".read": "auth != null",
       ".write": "root.child('users').child(auth.uid).child('isAdmin').val() === true"
     },
-    "countries": {
-      ".read": "true"
+    "votingEvents": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true",
+      "$eventId": {
+        "countries": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+        },
+        "votes": {
+          ".read": "auth != null",
+          "$userId": {
+            ".read": "auth != null",
+            ".write": "auth != null && auth.uid === $userId"
+          }
+        }
+      }
+    },
+    "votes": {
+      ".read": "auth != null",
+      "$eventId": {
+        "$userId": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid === $userId"
+        }
+      }
+    },
+    "groups": {
+      ".read": "auth != null",
+      "$groupId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        "name": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+        }
+      }
     },
     "users": {
       "$uid": {
@@ -16,37 +50,6 @@
             ".read": "auth != null",
             ".write": "auth != null && auth.uid === $uid"
           }
-        }
-      }
-    },
-    "votes": {
-      "$eventId": {
-        "$userId": {
-          ".read": "auth != null",
-          ".write": "auth != null && auth.uid === $userId"
-        }
-      }
-    },
-    "votingEvents": {
-      ".read": "auth != null",
-      ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
-    },
-    "groups": {
-      ".read": "auth != null",
-      "$groupId": {
-        ".read": "auth != null",
-        ".write": "auth != null && (!data.exists() || data.child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
-        "name": {
-          ".read": "auth != null",
-          ".write": "auth != null && (!data.exists() || root.child('groups').child($groupId).child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
-        },
-        "members": {
-          ".read": "auth != null",
-          ".write": "auth != null && (!data.exists() || root.child('groups').child($groupId).child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
-        },
-        "createdBy": {
-          ".read": "auth != null",
-          ".write": "auth != null && (!data.exists() || root.child('groups').child($groupId).child('createdBy').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
         }
       }
     }

@@ -2,6 +2,35 @@ export type VoteProfile = {
   groupNames: string[]
 }
 
+export type DatabaseStructure = {
+  activeEvent: string
+  votingEvents: {
+    [eventId: string]: {
+      countries: string[]
+      votes: {
+        [userId: string]: {
+          [country: string]: number
+        }
+      }
+    }
+  }
+  votes: {
+    [eventId: string]: {
+      [userId: string]: {
+        [country: string]: number
+      }
+    }
+  }
+  groups: {
+    [groupId: string]: {
+      name: string
+    }
+  }
+  users: {
+    [userId: string]: Profile
+  }
+}
+
 export type Profile = {
   uid: string
   displayName: string
@@ -10,11 +39,16 @@ export type Profile = {
   groups: {
     groupNames: Record<string, string>
   }
-  '2024-final'?: {
-    groupNames: string[]
-  }
   eurovision?: {
     groupNames: string[]
+  }
+}
+
+export type UserGroups = {
+  [groupId: string]: {
+    [userId: string]: {
+      name: string
+    }
   }
 }
 
@@ -28,12 +62,6 @@ export type Votes = {
 
 export type UserVotes = {
   [country: string]: number // country -> points
-}
-
-export type GroupVotes = {
-  [groupName: string]: {
-    [userId: string]: UserVotes
-  }
 }
 
 export type GlobalVotes = {

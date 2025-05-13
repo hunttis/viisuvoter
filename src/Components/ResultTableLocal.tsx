@@ -15,11 +15,18 @@ export const ResultTableLocal = ({
   groupName,
   activeVote,
 }: LocalTableProps) => {
+  // Debug prints
+  console.log('DEBUG ResultTableLocal: countries', countries)
+  console.log('DEBUG ResultTableLocal: currentGroupVotes', currentGroupVotes)
   const sortedLocalCountryScores = calculateLocalGroupScores(
     countries,
     currentGroupVotes,
     groupName,
     activeVote,
+  )
+  console.log(
+    'DEBUG ResultTableLocal: sortedLocalCountryScores',
+    sortedLocalCountryScores,
   )
 
   return (

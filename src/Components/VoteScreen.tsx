@@ -40,8 +40,12 @@ export const VoteScreen = ({
       else setCountries([])
     })
     const unsubVotes = onValue(votesRef, (snapshot) => {
-      if (snapshot.exists()) setVotes(snapshot.val())
-      else setVotes({})
+      // Fix: setVotes to the object with userIds as keys
+      if (snapshot.exists()) {
+        const val = snapshot.val()
+        setVotes(val)
+        console.log('DEBUG votes fetched:', val)
+      } else setVotes({})
     })
     const unsubGroups = onValue(groupsRef, (snapshot) => {
       if (snapshot.exists()) setGroups(snapshot.val())
@@ -61,37 +65,40 @@ export const VoteScreen = ({
 
   // Compute group/global votes when all data is loaded
   useEffect(() => {
-    if (Object.keys(groups).length > 0 && Object.keys(users).length > 0) {
-      // Set current user's votes
+    // Only require groups and votes to be loaded
+    if (
+      Object.keys(groups).length > 0 &&
+      votes &&
+      Object.keys(votes).length > 0
+    ) {
       setCurrentUserVotes(votes[profile.uid] || {})
-
-      // Calculate group votes
       const groupVotes: GroupVotes = {}
       const globalVotesData: GlobalVotes = {}
-      // Map of group names to member IDs
       const groupMembers: Record<string, string[]> = {}
       Object.entries(groups).forEach(([groupId, groupData]: [string, any]) => {
-        const groupName = groupData.name
         if (groupData.members) {
-          groupMembers[groupName] = Object.keys(groupData.members)
+          groupMembers[groupId] = Object.keys(groupData.members)
         }
       })
-      Object.entries(groupMembers).forEach(([groupName, memberIds]) => {
-        groupVotes[groupName] = {}
-        globalVotesData[groupName] = {}
+      Object.entries(groupMembers).forEach(([groupId, memberIds]) => {
+        groupVotes[groupId] = {}
+        globalVotesData[groupId] = {}
         memberIds.forEach((userId) => {
           if (votes[userId]) {
-            const userVotes = votes[userId] as Record<string, number>
-            // Keep the original country-to-points mapping
-            groupVotes[groupName][userId] = userVotes
-            globalVotesData[groupName][userId] = userVotes
+            groupVotes[groupId][userId] = votes[userId]
+            globalVotesData[groupId][userId] = votes[userId]
           }
         })
       })
       setCurrentGroupVotes(groupVotes)
       setGlobalVotes(globalVotesData)
+      // Debug output
+      console.log('DEBUG groupVotes:', groupVotes)
+      console.log('DEBUG globalVotesData:', globalVotesData)
+      console.log('DEBUG votes:', votes)
+      console.log('DEBUG groups:', groups)
     }
-  }, [votes, groups, users, profile.uid])
+  }, [votes, groups, profile.uid])
 
   // Save votes when they change
   useEffect(() => {
@@ -100,7 +107,6 @@ export const VoteScreen = ({
 
     // Only save if we have votes to save
     if (Object.keys(currentUserVotes).length > 0) {
-      console.log('Saving votes:', currentUserVotes)
       set(votesRef, currentUserVotes)
     } else {
       // If we have no votes, check if there are existing votes in the database
@@ -113,13 +119,15 @@ export const VoteScreen = ({
     }
   }, [currentUserVotes, activeEvent, profile.uid])
 
-  const userGroups = [
-    ...(profile.groups?.groupNames
-      ? Object.values(profile.groups.groupNames)
-      : []),
-    ...(profile['2024-final']?.groupNames || []),
-    ...(profile.eurovision?.groupNames || []),
-  ]
+  // Build userGroups as array of group IDs the user is a member of
+  const userGroups: string[] = profile.groups?.groupNames
+    ? Object.keys(profile.groups.groupNames)
+    : []
+
+  // Debug output for local scores props
+  console.log('DEBUG userGroups:', userGroups)
+  console.log('DEBUG currentGroupVotes:', currentGroupVotes)
+  console.log('DEBUG countries:', countries)
 
   return (
     <div className="container">
@@ -131,10 +139,10 @@ export const VoteScreen = ({
           <div className="box">
             <h3 className="title is-5 mb-4">Groups</h3>
             <div className="columns is-multiline">
-              {userGroups.map((group) => (
-                <div key={group} className="column">
+              {userGroups.map((groupId) => (
+                <div key={groupId} className="column">
                   <button className="button is-info is-outlined">
-                    {group}
+                    {profile.groups.groupNames[groupId] || groupId}
                   </button>
                 </div>
               ))}
@@ -197,24 +205,35 @@ export const VoteScreen = ({
           />
         </div>
 
-        {userGroups.map((group) => (
-          <div
-            key={group}
-            className="column is-6"
-            data-testid={`group-section-${group}`}
-          >
-            <h2 className="subtitle">
-              Current point totals for YOUR voting group: {group}
-            </h2>
-            <ResultTableLocal
-              countries={countries}
-              currentGroupVotes={currentGroupVotes[group] || {}}
-              groupName={group}
-              activeVote={activeEvent}
-              data-testid={`result-table-local-${group}`}
-            />
-          </div>
-        ))}
+        {userGroups.map((groupId) => {
+          // Debug output for each ResultTableLocal
+          console.log('DEBUG ResultTableLocal props:', {
+            groupId,
+            groupName: profile.groups.groupNames[groupId] || groupId,
+            currentGroupVotes: currentGroupVotes[groupId] || {},
+            countries,
+            activeVote: activeEvent,
+          })
+          return (
+            <div
+              key={groupId}
+              className="column is-6"
+              data-testid={`group-section-${profile.groups.groupNames[groupId] || groupId}`}
+            >
+              <h2 className="subtitle">
+                Current point totals for YOUR voting group:{' '}
+                {profile.groups.groupNames[groupId] || groupId}
+              </h2>
+              <ResultTableLocal
+                countries={countries}
+                currentGroupVotes={currentGroupVotes[groupId] || {}}
+                groupName={profile.groups.groupNames[groupId] || groupId}
+                activeVote={activeEvent}
+                data-testid={`result-table-local-${profile.groups.groupNames[groupId] || groupId}`}
+              />
+            </div>
+          )
+        })}
       </div>
     </div>
   )
