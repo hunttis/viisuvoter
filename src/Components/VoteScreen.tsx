@@ -153,11 +153,11 @@ export const VoteScreen = ({
 
       <div className="box mb-4">
         <h3 className="title is-5 mb-4">Your Vote</h3>
-        <table className="table is-fullwidth" data-testid="vote-table">
+        <table className="table is-fullwidth is-narrow" data-testid="vote-table" style={{ marginBottom: 0 }}>
           <thead>
             <tr>
-              <th style={{ width: '40%' }}>Country</th>
-              <th>Points</th>
+              <th style={{ width: '40%', padding: '0.25rem 0.5rem' }}>Country</th>
+              <th style={{ padding: '0.25rem 0.5rem' }}>Points</th>
             </tr>
           </thead>
           <tbody>
@@ -165,10 +165,10 @@ export const VoteScreen = ({
               // Check if this country has already been voted (by this user)
               const countryVoted = currentUserVotes.hasOwnProperty(country)
               return (
-                <tr key={country} data-testid={`country-row-${country}`}>
-                  <td>{country}</td>
-                  <td>
-                    <div className="buttons are-small">
+                <tr key={country} data-testid={`country-row-${country}`} style={{ height: '2.2rem' }}>
+                  <td style={{ padding: '0.25rem 0.5rem', fontSize: '0.95em' }}>{country}</td>
+                  <td style={{ padding: '0.25rem 0.5rem' }}>
+                    <div className="buttons are-small" style={{ flexWrap: 'nowrap', gap: '0.15rem', display: 'flex' }}>
                       {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => {
                         const isSelected = currentUserVotes[country] === points
                         const countryHasScore =
@@ -190,7 +190,8 @@ export const VoteScreen = ({
                           <button
                             key={points}
                             data-testid={`vote-btn-${country}-${points}`}
-                            className={btnClass}
+                            className={btnClass + ' is-small'}
+                            style={{ minWidth: '2.1em', padding: '0.2em 0.3em', fontSize: '0.95em' }}
                             onClick={() => {
                               const newVotes = { ...currentUserVotes }
                               if (isSelected) {
