@@ -59,13 +59,12 @@ const calculateGlobalScores = (
     })
 
   if (globalVotes && activeVote && Object.entries(globalVotes).length > 0) {
-    Object.entries(globalVotes).forEach((groupEntry) => {
-      const [groupKey, groupVotes] = groupEntry
-      Object.entries(groupVotes).forEach((groupVoteEntry) => {
-        const [, votesFromUser] = groupVoteEntry
-        Object.entries(votesFromUser).forEach((entry) => {
-          const [voteValue, forCountry] = entry
-          scoreMap[forCountry] = scoreMap[forCountry] + parseInt(voteValue)
+    Object.entries(globalVotes).forEach(([, groupVotes]) => {
+      Object.entries(groupVotes).forEach(([, votesFromUser]) => {
+        Object.entries(votesFromUser).forEach(([country, voteValue]) => {
+          if (scoreMap.hasOwnProperty(country)) {
+            scoreMap[country] += voteValue
+          }
         })
       })
     })
