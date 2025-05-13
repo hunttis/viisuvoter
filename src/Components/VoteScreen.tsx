@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getDatabase, ref, onValue, set } from 'firebase/database'
-import { Profile, VoteProfile, GroupVotes, GlobalVotes } from './Models'
+import { Profile, VoteProfile, GlobalVotes, countryFlags } from './Models'
 import { ResultTableGlobal } from './ResultTableGlobal'
 import { ResultTableLocal } from './ResultTableLocal'
 
@@ -192,11 +192,12 @@ export const VoteScreen = ({
                       fontSize: '0.95em',
                       fontWeight: 600,
                       borderBottom: 'none',
-                      textAlign: 'center',
                       marginTop: '0.5rem',
+                      textAlign: 'center',
                     }}
                   >
-                    {country}
+                    {countryFlags[country] || ''} {country}{' '}
+                    {countryFlags[country] || ''}
                   </td>
                 </tr>
                 <tr>
@@ -205,7 +206,7 @@ export const VoteScreen = ({
                     style={{
                       padding: '0.15rem 0.5rem',
                       borderTop: 'none',
-                      borderBottom: '1px solid #888',
+                      borderBottom: '1.5px solid #111',
                     }}
                   >
                     <div
