@@ -36,7 +36,6 @@ interface GroupData {
 export const MainView = () => {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [currentUserVotes, setCurrentUserVotes] = useState<UserVotes[]>([])
-  const [activeVote, setActiveVote] = useState<string>('eurovision')
   const [activeGroupName, setActiveGroupName] = useState<string>('')
   const [showManageGroups, setShowManageGroups] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
@@ -175,12 +174,12 @@ export const MainView = () => {
   }, [uid])
 
   useEffect(() => {
-    if (!profile || !activeVote) return
+    if (!profile || !activeEvent) return
 
     const db = getDatabase()
     const userGroups = Object.values(profile.groups?.groupNames || {})
 
-    const votesRef = ref(db, 'votes/eurovision')
+    const votesRef = ref(db, `votes/${activeEvent}`)
 
     onValue(votesRef, (snapshot) => {
       const data = snapshot.val()
@@ -196,13 +195,13 @@ export const MainView = () => {
         setVotes(data)
       }
     })
-  }, [profile, activeVote, activeGroupName])
+  }, [profile, activeEvent, activeGroupName])
 
   useEffect(() => {
-    if (!activeVote) return
+    if (!activeEvent) return
 
     const db = getDatabase()
-    const countriesRef = ref(db, `votingEvents/${activeVote}`)
+    const countriesRef = ref(db, `votingEvents/${activeEvent}`)
 
     onValue(countriesRef, (snapshot) => {
       const data = snapshot.val()
@@ -211,7 +210,7 @@ export const MainView = () => {
         setCountries(countriesList)
       }
     })
-  }, [activeVote])
+  }, [activeEvent])
 
   useEffect(() => {
     const db = getDatabase()
@@ -267,27 +266,22 @@ export const MainView = () => {
     try {
       const db = getDatabase()
       const activeEventRef = ref(db, 'activeEvent')
-      const activeVoteRef = ref(db, 'activeVote')
 
-      const [eventSnapshot, voteSnapshot] = await Promise.all([
-        get(activeEventRef),
-        get(activeVoteRef),
-      ])
+      const eventSnapshot = await get(activeEventRef)
 
-      // Use activeEvent if available, otherwise fall back to activeVote
       const activeEventName = eventSnapshot.exists()
         ? eventSnapshot.val()
-        : voteSnapshot.exists()
-          ? voteSnapshot.val()
-          : null
+        : null
 
       if (activeEventName) {
         setActiveEvent(activeEventName)
-        setActiveVote(activeEventName)
+      } else {
+        setActiveEvent(null)
       }
       setShowLoading(false)
     } catch (error) {
       console.error('Error loading active event:', error)
+      setActiveEvent(null)
       setShowLoading(false)
     }
   }
@@ -319,8 +313,8 @@ export const MainView = () => {
   const currentUser = auth.currentUser
 
   const showJoinGroup =
-    countries && currentUser && activeVote && !activeGroupName
-  const showVoting = countries && uid && activeGroupName && activeVote
+    countries && currentUser && activeEvent && !activeGroupName
+  const showVoting = countries && uid && activeGroupName && activeEvent
 
   const isAdmin = profile?.isAdmin === true
   console.log('Profile:', profile)

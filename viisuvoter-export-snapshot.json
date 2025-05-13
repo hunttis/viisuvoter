@@ -1,20 +1,12 @@
 {
   "activeEvent": "Eurovision 2025 - Semifinal 1",
-  "activeVote": "Eurovision 2025 - Semifinal 1",
   "groups": {
-    "-OLxIR0QudG12Es-S7Le": {
+    "-OQA4KXP3Lo8FKi6YKQa": {
       "createdBy": "Mc4F2pspu5NJ8InMzmwx4A5i7wq1",
       "members": {
         "Mc4F2pspu5NJ8InMzmwx4A5i7wq1": true
       },
       "name": "Wuffice"
-    },
-    "-OQ9no2WkL8D20kNKGeg": {
-      "createdBy": "Mc4F2pspu5NJ8InMzmwx4A5i7wq1",
-      "members": {
-        "Mc4F2pspu5NJ8InMzmwx4A5i7wq1": true
-      },
-      "name": "MtgSuomi"
     }
   },
   "users": {
@@ -22,11 +14,10 @@
       "displayName": "Ville Nuutinen",
       "groups": {
         "groupNames": {
-          "-OLxIR0QudG12Es-S7Le": "Wuffice",
-          "-OQ9no2WkL8D20kNKGeg": "MtgSuomi"
+          "-OQA4KXP3Lo8FKi6YKQa": "Wuffice"
         }
       },
-      "isAdmin": true,
+      "isAdmin": false,
       "photoURL": "https://lh4.googleusercontent.com/-zigCKq1_GP0/AAAAAAAAAAI/AAAAAAAAAjw/PUAf85m_two/photo.jpg",
       "uid": "Mc4F2pspu5NJ8InMzmwx4A5i7wq1"
     }
@@ -34,19 +25,15 @@
   "votes": {
     "Eurovision 2025 - Semifinal 1": {
       "Mc4F2pspu5NJ8InMzmwx4A5i7wq1": {
-        "Albania": 3,
-        "Azerbaijan": 12,
-        "Belgium": 2,
-        "Croatia": 2,
-        "Cyprus": 8,
-        "Estonia": 3,
-        "Iceland": 10,
-        "Norway": 3,
-        "Poland": 2,
-        "Portugal": 6,
-        "San Marino": 8,
-        "Slovenia": 5,
-        "Ukraine": 7
+        "Albania": 12,
+        "Cyprus": 7,
+        "Estonia": 2,
+        "Netherlands": 10,
+        "Norway": 4,
+        "Poland": 3,
+        "Portugal": 5,
+        "Sweden": 8,
+        "Ukraine": 1
       }
     }
   },
@@ -93,9 +80,6 @@
       ],
       "id": "Eurovision 2025 - Semifinal 2",
       "name": "Eurovision 2025 - Semifinal 2"
-    },
-    "Foofer": {
-      "name": "Foofer"
     }
   }
 }

@@ -34,7 +34,7 @@
       ".read": "auth != null",
       "$groupId": {
         ".read": "auth != null",
-        ".write": "auth != null && (!data.exists() || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        ".write": "auth != null",
         "name": {
           ".read": "auth != null",
           ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
