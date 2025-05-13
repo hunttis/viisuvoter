@@ -6,14 +6,12 @@ type LocalTableProps = {
   countries: string[]
   currentGroupVotes: { [userId: string]: UserVotes }
   groupName: string
-  activeVote: string
 }
 
 export const ResultTableLocal = ({
   countries,
   currentGroupVotes,
   groupName,
-  activeVote,
 }: LocalTableProps) => {
   // Debug prints
   console.log('DEBUG ResultTableLocal: countries', countries)
@@ -22,7 +20,6 @@ export const ResultTableLocal = ({
     countries,
     currentGroupVotes,
     groupName,
-    activeVote,
   )
   console.log(
     'DEBUG ResultTableLocal: sortedLocalCountryScores',
@@ -53,9 +50,8 @@ const calculateLocalGroupScores = (
   countries: string[],
   groupVotes: { [userId: string]: UserVotes },
   groupName: string,
-  activeVote: string,
 ) => {
-  if (!countries || !activeVote || !groupVotes || !groupName) {
+  if (!countries || !groupVotes || !groupName) {
     return []
   }
 

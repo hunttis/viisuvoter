@@ -6,7 +6,6 @@ import { UserVotes } from '../Models'
 describe('ResultTableLocal', () => {
   const mockCountries = ['Finland', 'Sweden', 'Norway', 'Denmark']
   const mockGroupName = 'Test Group'
-  const mockActiveVote = 'eurovision'
 
   it('renders group name and subtitle', () => {
     render(
@@ -14,7 +13,6 @@ describe('ResultTableLocal', () => {
         countries={mockCountries}
         currentGroupVotes={{}}
         groupName={mockGroupName}
-        activeVote={mockActiveVote}
       />,
     )
     expect(screen.getByText(/Current point totals for/)).toBeInTheDocument()
@@ -31,7 +29,6 @@ describe('ResultTableLocal', () => {
         countries={mockCountries}
         currentGroupVotes={votes}
         groupName={mockGroupName}
-        activeVote={mockActiveVote}
       />,
     )
     // Use the new testids for each country score
@@ -70,7 +67,6 @@ describe('ResultTableLocal', () => {
         countries={mockCountries}
         currentGroupVotes={votes}
         groupName={mockGroupName}
-        activeVote={mockActiveVote}
       />,
     )
     const rows = screen.getAllByTestId('country-score')
@@ -94,7 +90,6 @@ describe('ResultTableLocal', () => {
         countries={[]}
         currentGroupVotes={votes}
         groupName={mockGroupName}
-        activeVote={mockActiveVote}
       />,
     )
     expect(screen.getByText(/Current point totals for/)).toBeInTheDocument()

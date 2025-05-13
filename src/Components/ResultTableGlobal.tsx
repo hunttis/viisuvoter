@@ -6,7 +6,6 @@ import { GlobalVotes } from './Models'
 type GlobalTableProps = {
   countries: string[]
   globalVotes: GlobalVotes
-  activeVote: string
 }
 
 type CountryVotes = {
@@ -17,16 +16,14 @@ type CountryVotes = {
 export const ResultTableGlobal = ({
   countries,
   globalVotes,
-  activeVote,
 }: GlobalTableProps) => {
-  if (!countries || !activeVote || !globalVotes) {
+  if (!countries || !globalVotes) {
     return <div>Global scores not yet available</div>
   }
 
   const sortedGlobalCountryScores: CountryVotes[] = calculateGlobalScores(
     countries,
     globalVotes,
-    activeVote,
   )
 
   return (
@@ -48,7 +45,6 @@ export const ResultTableGlobal = ({
 const calculateGlobalScores = (
   countries: string[],
   globalVotes: GlobalVotes,
-  activeVote: string,
 ) => {
   let scoreMap: Record<string, number> = {}
 
@@ -58,7 +54,7 @@ const calculateGlobalScores = (
       scoreMap[country] = 0
     })
 
-  if (globalVotes && activeVote && Object.entries(globalVotes).length > 0) {
+  if (globalVotes && Object.entries(globalVotes).length > 0) {
     Object.entries(globalVotes).forEach(([, groupVotes]) => {
       Object.entries(groupVotes).forEach(([, votesFromUser]) => {
         Object.entries(votesFromUser).forEach(([country, voteValue]) => {

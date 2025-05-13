@@ -213,11 +213,7 @@ export const VoteScreen = ({
 
       <div className="columns is-multiline">
         <div className="column is-12" data-testid="global-results">
-          <ResultTableGlobal
-            countries={countries}
-            globalVotes={globalVotes}
-            activeVote={activeEvent}
-          />
+          <ResultTableGlobal countries={countries} globalVotes={globalVotes} />
         </div>
 
         {userGroups.map((groupId) => {
@@ -227,7 +223,6 @@ export const VoteScreen = ({
             groupName: profile.groups.groupNames[groupId] || groupId,
             currentGroupVotes: currentGroupVotes[groupId] || {},
             countries,
-            activeVote: activeEvent,
           })
           return (
             <div
@@ -243,7 +238,6 @@ export const VoteScreen = ({
                 countries={countries}
                 currentGroupVotes={currentGroupVotes[groupId] || {}}
                 groupName={profile.groups.groupNames[groupId] || groupId}
-                activeVote={activeEvent}
                 data-testid={`result-table-local-${profile.groups.groupNames[groupId] || groupId}`}
               />
             </div>

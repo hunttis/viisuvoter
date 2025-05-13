@@ -384,7 +384,6 @@ export const MainView = () => {
           profile={profile!}
           onBack={handleManageGroupsBack}
           uid={uid}
-          activeVote={activeVote}
         />
       ) : showAdmin ? (
         <AdminPage profile={profile!} onBack={() => setShowAdmin(false)} />

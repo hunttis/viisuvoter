@@ -6,7 +6,6 @@ interface ChooseVotingGroupPageProps {
   setGroupName: (value: string) => void
   onSubmitGroupName: () => void
   uid: string
-  activeVote: string
   profile: Profile | null
 }
 
@@ -14,15 +13,14 @@ export const ChooseVotingGroupPage = ({
   setGroupName,
   onSubmitGroupName,
   uid,
-  activeVote,
   profile,
 }: ChooseVotingGroupPageProps) => {
   const [existingGroups, setExistingGroups] = useState<string[]>([])
   const db = getDatabase()
 
   useEffect(() => {
-    const votesRef = ref(db, `votes/${activeVote}`)
-    const unsubscribe = onValue(votesRef, (snapshot) => {
+    const groupsRef = ref(db, 'groups')
+    const unsubscribe = onValue(groupsRef, (snapshot) => {
       const data = snapshot.val()
       if (data) {
         const groups = Object.keys(data)
@@ -30,9 +28,11 @@ export const ChooseVotingGroupPage = ({
       }
     })
     return () => unsubscribe()
-  }, [activeVote])
+  }, [])
 
-  const userGroups = (profile?.[activeVote] as VoteProfile)?.groupNames || []
+  const userGroups = profile?.groups?.groupNames
+    ? Object.keys(profile.groups.groupNames)
+    : []
 
   return (
     <div className="container">

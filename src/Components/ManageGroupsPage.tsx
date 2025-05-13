@@ -15,14 +15,12 @@ type ManageGroupsPageProps = {
   profile: Profile
   onBack: () => void
   uid: string
-  activeVote: string
 }
 
 export const ManageGroupsPage = ({
   profile,
   onBack,
   uid,
-  activeVote,
 }: ManageGroupsPageProps) => {
   const [groups, setGroups] = useState<
     Array<{
