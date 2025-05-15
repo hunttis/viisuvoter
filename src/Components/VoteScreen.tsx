@@ -121,27 +121,13 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
   // Remove the outer <div className="container"> and return the content directly
   return (
     <>
-      <div className="level mb-4">
-        <div className="level-left">
+      <div className="mb-4">
+        <div className="has-text-centered">
           <h2 className="title is-4">{activeEvent}</h2>
-        </div>
-        <div className="level-right">
-          <div className="box">
-            <h3 className="title is-5 mb-4">Groups</h3>
-            <div className="columns is-multiline">
-              {userGroups.map((groupId) => (
-                <div key={groupId} className="column">
-                  <button className="button is-info is-outlined">
-                    {profile.groups.groupNames[groupId] || groupId}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
-      <h3 className="title is-5 mb-4">Your Vote</h3>
+      {/* <h3 className="title is-5">Your Vote</h3> */}
       <table
         className="table is-fullwidth is-narrow vote-table"
         data-testid="vote-table"

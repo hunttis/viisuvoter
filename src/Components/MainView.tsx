@@ -21,6 +21,22 @@ interface GroupData {
   members: Record<string, boolean>
 }
 
+const GroupsBar: React.FC<{
+  userGroups: string[]
+  groupNames: Record<string, string>
+}> = ({ userGroups, groupNames }) => (
+  <div className="box">
+    <div className="columns">
+      <div className="button is-disabled is-small">Groups</div>
+      {userGroups.map((groupId) => (
+        <button key={groupId} className="button is-info is-outlined is-small">
+          {groupNames[groupId] || groupId}
+        </button>
+      ))}
+    </div>
+  </div>
+)
+
 export const MainView = () => {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [currentUserVotes, setCurrentUserVotes] = useState<UserVotes[]>([])
@@ -357,25 +373,43 @@ export const MainView = () => {
     setShowManageGroups,
     logout,
   }) => (
-    <div className="buttons">
-      {profile?.isAdmin && (
-        <button
-          className="button is-primary"
-          onClick={() => setShowAdmin(true)}
-        >
-          Admin Panel
-        </button>
-      )}
-      <button
-        className="button is-info"
-        onClick={() => setShowManageGroups(true)}
-      >
-        Manage Groups
-      </button>
-      <button className="button is-light" onClick={logout}>
-        Logout
-      </button>
-    </div>
+    <>
+      <div className="column">
+        <div className="box buttons are-small">
+          <div className="columns">
+            {profile?.isAdmin && (
+              <div className="">
+                <button
+                  className="button is-primary"
+                  onClick={() => setShowAdmin(true)}
+                >
+                  Admin Panel
+                </button>
+              </div>
+            )}
+            <div className="">
+              <button
+                className="button is-info"
+                onClick={() => setShowManageGroups(true)}
+              >
+                Manage Groups
+              </button>
+            </div>
+            <div className="">
+              <button className="button is-light" onClick={logout}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="">
+        <GroupsBar
+          userGroups={Object.keys(profile?.groups?.groupNames || {})}
+          groupNames={profile?.groups?.groupNames || {}}
+        />
+      </div>
+    </>
   )
 
   return (
@@ -396,11 +430,11 @@ export const MainView = () => {
         <AdminPage profile={profile!} onBack={() => setShowAdmin(false)} />
       ) : (
         <>
-          <div className="level">
-            <div className="level-left">
-              <h1 className="title is-1">Eurovision Voter</h1>
+          <div className="columns mu-8">
+            <div className="column ">
+              <h1 className="title is-1 has-text-centered">Eurovision Voter</h1>
             </div>
-            <div className="level-right">
+            <div className="column">
               <TopRightButtons
                 profile={profile}
                 setShowAdmin={setShowAdmin}
