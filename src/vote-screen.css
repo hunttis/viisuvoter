@@ -1,19 +1,11 @@
 /* Custom styles for VoteScreen component */
 
-.vote-table {
-  border-top: 2px solid #888;
-}
-
 .vote-country-row {
   height: 1.6rem;
 }
 
 .vote-country-name {
   margin-top: 0.5rem;
-}
-
-.vote-buttons-row {
-  border-bottom: 1.5px solid #111;
 }
 
 .vote-buttons {

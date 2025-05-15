@@ -118,10 +118,8 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
   console.log('DEBUG currentGroupVotes:', currentGroupVotes)
   console.log('DEBUG countries:', countries)
 
-  // Remove the outer <div className="container"> and return the content directly
   return (
     <>
-      {/* <h3 className="title is-5">Your Vote</h3> */}
       <table
         className="table is-fullwidth is-narrow vote-table"
         data-testid="vote-table"
@@ -150,7 +148,7 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
               </tr>
               <tr>
                 <td colSpan={2} className="py-1 px-2 vote-buttons-row">
-                  <div className="buttons vote-buttons">
+                  <div className="buttons vote-buttons has-addons">
                     {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => {
                       const isSelected = currentUserVotes[country] === points
                       const countryHasScore =
@@ -166,7 +164,7 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
                       } else if (scoreUsedElsewhere) {
                         btnClass += 'is-dark'
                       } else {
-                        btnClass += 'is-info is-outlined'
+                        btnClass += 'is-info'
                       }
                       return (
                         <button
