@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { VoteScreen } from '../VoteScreen'
@@ -13,47 +12,6 @@ jest.mock('firebase/database', () => ({
   onValue: jest.fn(),
   set: jest.fn(),
 }))
-
-// Mock data
-const mockProfile: Profile = {
-  uid: 'test-uid',
-  displayName: 'Test User',
-  photoURL: 'https://example.com/photo.jpg',
-  isAdmin: false,
-  groups: {
-    groupNames: { 'Test Group': 'Test Group' },
-  },
-}
-
-const mockCountries = ['Finland', 'Sweden', 'Norway']
-
-const mockVotes = {
-  'test-uid': {
-    Finland: 12,
-    Sweden: 10,
-    Norway: 8,
-  },
-  'other-user': {
-    Finland: 10,
-    Sweden: 12,
-    Norway: 8,
-  },
-}
-
-const mockGroups = {
-  'group-1': {
-    name: 'Test Group',
-    members: {
-      'test-uid': true,
-      'other-user': true,
-    },
-  },
-}
-
-const mockUsers = {
-  'test-uid': { displayName: 'Test User' },
-  'other-user': { displayName: 'Other User' },
-}
 
 // Remove all previous tests and write new ones for the Eurovision voting screen
 
@@ -202,7 +160,6 @@ describe('VoteScreen (Eurovision voting)', () => {
         countries={mockCountries}
         currentGroupVotes={mockVotes}
         groupName="Euro Group"
-        activeVote="eurovision"
       />,
     )
     expect(screen.getByTestId('group-subtitle')).toBeInTheDocument()

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { ResultTableLocal } from './ResultTableLocal'
-import { ResultTableGlobal } from './ResultTableGlobal'
 import {
   getAuth,
   GoogleAuthProvider,
@@ -8,22 +6,12 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth'
-import { getDatabase, onValue, ref, set, update, get } from 'firebase/database'
+import { getDatabase, onValue, ref, set, get } from 'firebase/database'
 import { VoteScreen } from './VoteScreen'
 import { LoginPage } from './LoginPage'
-import { ChooseVotingGroupPage } from './ChooseVotingGroupPage'
-import { LoadingScreen } from './LoadingScreen'
-import { UserOptions } from './UserOptions'
 import { ManageGroupsPage } from './ManageGroupsPage'
 import { AdminPage } from './AdminPage'
-import {
-  Countries,
-  GroupVotes,
-  Profile,
-  UserVotes,
-  VoteProfile,
-  GlobalVotes,
-} from './Models'
+import { GroupVotes, Profile, UserVotes, GlobalVotes } from './Models'
 
 export const pointAmounts = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
 
@@ -40,20 +28,12 @@ export const MainView = () => {
   const [showManageGroups, setShowManageGroups] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
   const [countries, setCountries] = useState<string[]>([])
-  const [groupName, setGroupName] = useState<string>('')
-  const [votes, setVotes] = useState<GlobalVotes>({})
-  const [castVotes, setCastVotes] = useState({})
   const [currentGroupVotes, setCurrentGroupVotes] = useState<GroupVotes>({})
   const [globalVotes, setGlobalVotes] = useState({})
   const [uid, setUid] = useState<string>('')
   const [showLogin, setShowLogin] = useState(false)
-  const [showUserOptions, setShowUserOptions] = useState(false)
   const [showLoading, setShowLoading] = useState(true)
   const [activeEvent, setActiveEvent] = useState<string | null>(null)
-
-  const onChange = (value) => {
-    setGroupName(value)
-  }
 
   useEffect(() => {
     const auth = getAuth()
@@ -114,7 +94,6 @@ export const MainView = () => {
         setUid('')
         setActiveGroupName('')
         setCurrentUserVotes([])
-        setVotes({})
         setCurrentGroupVotes({})
         setGlobalVotes({})
         setActiveEvent(null)
@@ -192,7 +171,6 @@ export const MainView = () => {
         })
         setCurrentUserVotes(userVotes)
         setCurrentGroupVotes(data[activeGroupName] || {})
-        setVotes(data)
       }
     })
   }, [profile, activeEvent, activeGroupName])
@@ -287,7 +265,7 @@ export const MainView = () => {
   }
 
   const onSubmitGroupName = async () => {
-    if (!groupName || !profile || !uid) return
+    if (!profile || !uid) return
 
     const db = getDatabase()
     const newGroupRef = ref(db, `groups/${groupName}`)
@@ -401,7 +379,7 @@ export const MainView = () => {
   )
 
   return (
-    <div style={{ padding: '16px' }}>
+    <div className="container">
       {showLoading ? (
         <div className="has-text-centered">
           <p className="is-size-4">Loading...</p>
@@ -420,7 +398,7 @@ export const MainView = () => {
         <>
           <div className="level">
             <div className="level-left">
-              <h1 className="title">Eurovision Voter</h1>
+              <h1 className="title is-1">Eurovision Voter</h1>
             </div>
             <div className="level-right">
               <TopRightButtons

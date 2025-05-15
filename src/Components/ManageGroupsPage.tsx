@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import {
   getDatabase,
   ref,
-  onValue,
   set,
   remove,
   get,
@@ -314,11 +313,7 @@ export const ManageGroupsPage = ({
                   <header className="card-header">
                     <p className="card-header-title">{group.name}</p>
                     <button
-                      className={`button is-static is-small ${
-                        isMember
-                          ? 'is-success is-outlined'
-                          : 'is-danger is-outlined'
-                      }`}
+                      className={`button is-static is-small ${isMember ? 'is-success is-outlined' : 'is-danger is-outlined'}`}
                     >
                       {isMember ? 'Member' : 'Not a Member'}
                     </button>

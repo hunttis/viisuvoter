@@ -70,6 +70,12 @@ export type GlobalVotes = {
   }
 }
 
+export type GroupVotes = {
+  [groupId: string]: {
+    [userId: string]: UserVotes
+  }
+}
+
 // Eurovision country to flag emoji map
 export const countryFlags: Record<string, string> = {
   Albania: '🇦🇱',
@@ -84,7 +90,7 @@ export const countryFlags: Record<string, string> = {
   'Czech Republic': '🇨🇿',
   Denmark: '🇩🇰',
   Estonia: '🇪🇪',
-  Finland: '🇫🇮',
+  Finland: '🇫�',
   France: '🇫🇷',
   Georgia: '🇬🇪',
   Germany: '🇩🇪',
@@ -94,7 +100,7 @@ export const countryFlags: Record<string, string> = {
   Israel: '🇮🇱',
   Italy: '🇮🇹',
   Latvia: '🇱🇻',
-  Lithuania: '🇱🇹',
+  Lithuania: '🇱�',
   Luxembourg: '🇱🇺',
   Malta: '🇲🇹',
   Moldova: '🇲🇩',
@@ -112,14 +118,14 @@ export const countryFlags: Record<string, string> = {
   Switzerland: '🇨🇭',
   Ukraine: '🇺🇦',
   'United Kingdom': '🇬🇧',
-  Montenegro: '🇲🇪',
+  Montenegro: '🇲�',
   Russia: '🇷🇺',
   Turkey: '🇹🇷',
   Hungary: '🇭🇺',
   Slovakia: '🇸🇰',
   Bosnia: '🇧🇦',
   'Bosnia and Herzegovina': '🇧🇦',
-  Belarus: '🇧🇾',
+  Belarus: '🇧�',
   Morocco: '🇲🇦',
   Monaco: '🇲🇨',
   Andorra: '🇦🇩',

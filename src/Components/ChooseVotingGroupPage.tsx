@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getDatabase, ref, onValue } from 'firebase/database'
-import { Profile, VoteProfile } from './Models'
+import { Profile } from './Models'
 
 interface ChooseVotingGroupPageProps {
   setGroupName: (value: string) => void

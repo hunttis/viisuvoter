@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { getDatabase, ref, onValue, set } from 'firebase/database'
-import { Profile, VoteProfile, GlobalVotes, countryFlags } from './Models'
+import { Profile, GlobalVotes, countryFlags, GroupVotes } from './Models'
 import { ResultTableGlobal } from './ResultTableGlobal'
 import { ResultTableLocal } from './ResultTableLocal'
+import '../vote-screen.css'
 
 type VoteScreenProps = {
   profile: Profile
@@ -11,19 +12,13 @@ type VoteScreenProps = {
   setActiveGroupName: (name: string) => void
 }
 
-export const VoteScreen = ({
-  profile,
-  activeEvent,
-  activeGroupName,
-  setActiveGroupName,
-}: VoteScreenProps) => {
+export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
   const [countries, setCountries] = useState<string[]>([])
   const [currentUserVotes, setCurrentUserVotes] = useState<
     Record<string, number>
   >({})
   const [votes, setVotes] = useState<any>({})
   const [groups, setGroups] = useState<any>({})
-  const [users, setUsers] = useState<any>({})
   const [currentGroupVotes, setCurrentGroupVotes] = useState<GroupVotes>({})
   const [globalVotes, setGlobalVotes] = useState<GlobalVotes>({})
 
@@ -33,7 +28,6 @@ export const VoteScreen = ({
     const countriesRef = ref(db, `votingEvents/${activeEvent}/countries`)
     const votesRef = ref(db, `votes/${activeEvent}`)
     const groupsRef = ref(db, 'groups')
-    const usersRef = ref(db, 'users')
 
     const unsubCountries = onValue(countriesRef, (snapshot) => {
       if (snapshot.exists()) setCountries(snapshot.val())
@@ -51,15 +45,10 @@ export const VoteScreen = ({
       if (snapshot.exists()) setGroups(snapshot.val())
       else setGroups({})
     })
-    const unsubUsers = onValue(usersRef, (snapshot) => {
-      if (snapshot.exists()) setUsers(snapshot.val())
-      else setUsers({})
-    })
     return () => {
       unsubCountries()
       unsubVotes()
       unsubGroups()
-      unsubUsers()
     }
   }, [activeEvent])
 
@@ -152,132 +141,75 @@ export const VoteScreen = ({
         </div>
       </div>
 
-      {/* Remove the box from around the voting grid */}
-      <h3
-        className="title is-5 mb-4"
-        style={{
-          marginLeft: 0,
-          marginRight: 0,
-          paddingLeft: 0,
-          paddingRight: 0,
-        }}
-      >
-        Your Vote
-      </h3>
+      <h3 className="title is-5 mb-4">Your Vote</h3>
       <table
-        className="table is-fullwidth is-narrow"
+        className="table is-fullwidth is-narrow vote-table"
         data-testid="vote-table"
-        style={{
-          marginBottom: 0,
-          marginLeft: 0,
-          marginRight: 0,
-          paddingLeft: 0,
-          paddingRight: 0,
-          width: '100%',
-          borderTop: '2px solid #888', // medium dark gray
-        }}
       >
         <tbody>
-          {countries.map((country) => {
-            return (
-              <React.Fragment key={country}>
-                <tr
-                  data-testid={`country-row-${country}`}
-                  style={{ height: '1.6rem' }}
+          {countries.map((country) => (
+            <React.Fragment key={country}>
+              <tr
+                data-testid={`country-row-${country}`}
+                className="vote-country-row"
+              >
+                <td
+                  colSpan={2}
+                  className="has-text-centered has-text-weight-semibold has-text-primary is-size-6 py-1 px-2 vote-country-name"
                 >
-                  <td
-                    colSpan={2}
-                    style={{
-                      padding: '0.25rem 0.5rem',
-                      fontSize: '0.95em',
-                      fontWeight: 600,
-                      borderBottom: 'none',
-                      marginTop: '0.5rem',
-                      textAlign: 'center',
-                    }}
-                  >
-                    {countryFlags[country] || ''} {country}{' '}
-                    {countryFlags[country] || ''}
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    colSpan={2}
-                    style={{
-                      padding: '0.15rem 0.5rem',
-                      borderTop: 'none',
-                      borderBottom: '1.5px solid #111',
-                    }}
-                  >
-                    <div
-                      className="buttons"
-                      style={{
-                        flexWrap: 'nowrap',
-                        gap: '0.15rem',
-                        display: 'flex',
-                        marginBottom: '0.5rem', // increased margin for separation
-                        width: '100%',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => {
-                        const isSelected = currentUserVotes[country] === points
-                        const countryHasScore =
-                          typeof currentUserVotes[country] === 'number'
-                        const scoreUsedElsewhere = Object.entries(
-                          currentUserVotes,
-                        ).some(([c, p]) => c !== country && p === points)
-                        let btnClass = 'button '
-                        if (isSelected) {
-                          btnClass += 'is-primary'
-                        } else if (countryHasScore) {
-                          btnClass += 'is-dark'
-                        } else if (scoreUsedElsewhere) {
-                          btnClass += 'is-dark'
-                        } else {
-                          btnClass += 'is-info is-outlined'
-                        }
-                        return (
-                          <button
-                            key={points}
-                            data-testid={`vote-btn-${country}-${points}`}
-                            className={btnClass}
-                            style={{
-                              minWidth: 0,
-                              flex: 1,
-                              padding: '0.2em 0.3em',
-                              fontSize: '0.95em',
-                              marginLeft: '0.05em',
-                              marginRight: '0.05em',
-                            }}
-                            onClick={() => {
-                              const newVotes = { ...currentUserVotes }
-                              if (isSelected) {
-                                // Remove the vote for this country
-                                delete newVotes[country]
-                              } else {
-                                // Remove this score from any other country
-                                Object.entries(newVotes).forEach(([c, p]) => {
-                                  if (c !== country && p === points) {
-                                    delete newVotes[c]
-                                  }
-                                })
-                                // Set this score for this country
-                                newVotes[country] = points
-                              }
-                              setCurrentUserVotes(newVotes)
-                            }}
-                          >
-                            {points}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </td>
-                </tr>
-              </React.Fragment>
-            )
-          })}
+                  {countryFlags[country] || ''} {country}{' '}
+                  {countryFlags[country] || ''}
+                </td>
+              </tr>
+              <tr>
+                <td colSpan={2} className="py-1 px-2 vote-buttons-row">
+                  <div className="buttons vote-buttons">
+                    {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => {
+                      const isSelected = currentUserVotes[country] === points
+                      const countryHasScore =
+                        typeof currentUserVotes[country] === 'number'
+                      const scoreUsedElsewhere = Object.entries(
+                        currentUserVotes,
+                      ).some(([c, p]) => c !== country && p === points)
+                      let btnClass = 'button vote-btn '
+                      if (isSelected) {
+                        btnClass += 'is-primary'
+                      } else if (countryHasScore) {
+                        btnClass += 'is-dark'
+                      } else if (scoreUsedElsewhere) {
+                        btnClass += 'is-dark'
+                      } else {
+                        btnClass += 'is-info is-outlined'
+                      }
+                      return (
+                        <button
+                          key={points}
+                          data-testid={`vote-btn-${country}-${points}`}
+                          className={btnClass}
+                          onClick={() => {
+                            const newVotes = { ...currentUserVotes }
+                            if (isSelected) {
+                              delete newVotes[country]
+                            } else {
+                              Object.entries(newVotes).forEach(([c, p]) => {
+                                if (c !== country && p === points) {
+                                  delete newVotes[c]
+                                }
+                              })
+                              newVotes[country] = points
+                            }
+                            setCurrentUserVotes(newVotes)
+                          }}
+                        >
+                          {points}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </td>
+              </tr>
+            </React.Fragment>
+          ))}
         </tbody>
       </table>
 
