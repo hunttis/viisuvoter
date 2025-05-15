@@ -176,7 +176,17 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
                           onClick={() => {
                             const newVotes = { ...currentUserVotes }
                             if (isSelected) {
+                              // Always allow removing the vote for this country
                               delete newVotes[country]
+                              // If this was the last vote, write an empty object to Firebase
+                              if (Object.keys(newVotes).length === 0) {
+                                const db = getDatabase()
+                                const votesRef = ref(
+                                  db,
+                                  `votes/${activeEvent}/${profile.uid}`,
+                                )
+                                set(votesRef, {})
+                              }
                             } else {
                               Object.entries(newVotes).forEach(([c, p]) => {
                                 if (c !== country && p === points) {
