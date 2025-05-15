@@ -35,13 +35,6 @@ describe('CountryScore', () => {
     expect(third.querySelector('.has-text-info')).toBeInTheDocument()
   })
 
-  it('applies correct color class for lower ranks', () => {
-    const { container } = render(
-      <CountryScore countryVotes={{ name: 'D', votes: 4 }} index={5} />,
-    )
-    expect(container.querySelector('.has-text-white')).toBeInTheDocument()
-  })
-
   it('applies additionalStyles prop', () => {
     const { container } = render(
       <CountryScore

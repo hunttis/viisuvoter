@@ -25,11 +25,11 @@ const GroupsBar: React.FC<{
   userGroups: string[]
   groupNames: Record<string, string>
 }> = ({ userGroups, groupNames }) => (
-  <div className="box">
+  <div className="buttons has-addons are-small is-centered">
     <div className="columns">
-      <div className="button is-disabled is-small">Groups</div>
+      <div className="button is-disabled">Groups</div>
       {userGroups.map((groupId) => (
-        <button key={groupId} className="button is-info is-outlined is-small">
+        <button key={groupId} className="button is-disabled is-info">
           {groupNames[groupId] || groupId}
         </button>
       ))}
@@ -375,35 +375,28 @@ export const MainView = () => {
   }) => (
     <>
       <div className="column">
-        <div className="box buttons are-small">
-          <div className="columns">
-            {profile?.isAdmin && (
-              <div className="">
-                <button
-                  className="button is-primary"
-                  onClick={() => setShowAdmin(true)}
-                >
-                  Admin Panel
-                </button>
-              </div>
-            )}
-            <div className="">
-              <button
-                className="button is-info"
-                onClick={() => setShowManageGroups(true)}
-              >
-                Manage Groups
-              </button>
-            </div>
-            <div className="">
-              <button className="button is-light" onClick={logout}>
-                Logout
-              </button>
-            </div>
-          </div>
+        <div className="buttons has-addons are-small is-centered">
+          <div className="button is-disabled">Actions</div>
+          {profile?.isAdmin && (
+            <button
+              className="button is-primary"
+              onClick={() => setShowAdmin(true)}
+            >
+              Admin
+            </button>
+          )}
+          <button
+            className="button is-info"
+            onClick={() => setShowManageGroups(true)}
+          >
+            Manage Groups
+          </button>
+          <button className="button is-light" onClick={logout}>
+            Logout
+          </button>
         </div>
       </div>
-      <div className="">
+      <div className="column">
         <GroupsBar
           userGroups={Object.keys(profile?.groups?.groupNames || {})}
           groupNames={profile?.groups?.groupNames || {}}

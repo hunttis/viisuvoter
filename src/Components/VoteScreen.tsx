@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, act } from 'react'
 import { getDatabase, ref, onValue, set } from 'firebase/database'
 import { Profile, GlobalVotes, countryFlags, GroupVotes } from './Models'
 import { ResultTableGlobal } from './ResultTableGlobal'
@@ -121,17 +121,18 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
   // Remove the outer <div className="container"> and return the content directly
   return (
     <>
-      <div className="mb-4">
-        <div className="has-text-centered">
-          <h2 className="title is-4">{activeEvent}</h2>
-        </div>
-      </div>
-
       {/* <h3 className="title is-5">Your Vote</h3> */}
       <table
         className="table is-fullwidth is-narrow vote-table"
         data-testid="vote-table"
       >
+        <thead>
+          <tr>
+            <th>
+              <div className="title has-text-centered">{activeEvent}</div>
+            </th>
+          </tr>
+        </thead>
         <tbody>
           {countries.map((country) => (
             <React.Fragment key={country}>
@@ -218,10 +219,6 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
               className="column is-6"
               data-testid={`group-section-${profile.groups.groupNames[groupId] || groupId}`}
             >
-              <h2 className="subtitle">
-                Current point totals for YOUR voting group:{' '}
-                {profile.groups.groupNames[groupId] || groupId}
-              </h2>
               <ResultTableLocal
                 countries={countries}
                 currentGroupVotes={currentGroupVotes[groupId] || {}}

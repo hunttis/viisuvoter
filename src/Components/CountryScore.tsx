@@ -20,11 +20,11 @@ export const CountryScore = ({
   let color = ''
   switch (index) {
     case 0:
-      color = 'has-text-success'
+      color = 'has-text-success has-text-weight-bold'
       break
     case 1:
     case 2:
-      color = 'has-text-info'
+      color = 'has-text-info has-text-weight-bold'
       break
     case 3:
     case 4:
@@ -33,7 +33,7 @@ export const CountryScore = ({
     case 7:
     case 8:
     case 9:
-      color = 'has-text-white'
+      color = ''
       break
     default:
       color = 'has-text-grey'

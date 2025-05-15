@@ -28,7 +28,7 @@ export const ResultTableGlobal = ({
 
   return (
     <div className="column">
-      <h2 className="subtitle ">
+      <h2 className="title is-4">
         Current point totals <strong>ACROSS ALL</strong> voting groups
       </h2>
       {sortedGlobalCountryScores.map(
