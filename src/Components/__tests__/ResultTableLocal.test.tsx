@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { ResultTableLocal } from '../ResultTableLocal'
 import { UserVotes } from '../Models'

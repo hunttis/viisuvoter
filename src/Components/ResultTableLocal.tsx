@@ -1,4 +1,3 @@
-import React from 'react'
 import { CountryScore } from './CountryScore'
 import { UserVotes } from './Models'
 

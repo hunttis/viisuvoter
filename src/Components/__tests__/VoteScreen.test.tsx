@@ -2,13 +2,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { VoteScreen } from '../VoteScreen'
 import { onValue, set } from 'firebase/database'
-import { Profile } from '../Models'
 import { ResultTableLocal } from '../ResultTableLocal'
 
 // Mock Firebase
 jest.mock('firebase/database', () => ({
   getDatabase: jest.fn(() => ({})),
-  ref: jest.fn((db, path) => ({ path })),
+  ref: jest.fn((_, path) => ({ path })),
   onValue: jest.fn(),
   set: jest.fn(),
 }))

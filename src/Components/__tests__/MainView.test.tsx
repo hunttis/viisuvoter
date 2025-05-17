@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { MainView } from '../MainView'
@@ -33,6 +32,10 @@ jest.mock('../AdminPage', () => ({
 }))
 
 // Mock Firebase
+declare global {
+  // eslint-disable-next-line no-var
+  var firebase: any
+}
 globalThis.firebase = {}
 jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(() => ({})),

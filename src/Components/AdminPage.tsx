@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
   DragDropContext,
   Droppable,
@@ -65,7 +65,7 @@ const EUROVISION_COUNTRIES = [
   'United Kingdom',
 ].sort()
 
-export const AdminPage = ({ profile, onBack }: AdminPageProps) => {
+export const AdminPage = ({ onBack }: AdminPageProps) => {
   const [events, setEvents] = useState<VotingEvent[]>([])
   const [newEventName, setNewEventName] = useState('')
   const [selectedEvent, setSelectedEvent] = useState<VotingEvent | null>(null)

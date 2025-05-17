@@ -1,5 +1,3 @@
-import React from 'react'
-
 type CountryVotes = {
   name: string
   votes: number

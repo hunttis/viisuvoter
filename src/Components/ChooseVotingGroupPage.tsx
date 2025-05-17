@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { getDatabase, ref, onValue } from 'firebase/database'
 import { Profile } from './Models'
 
@@ -12,7 +12,6 @@ interface ChooseVotingGroupPageProps {
 export const ChooseVotingGroupPage = ({
   setGroupName,
   onSubmitGroupName,
-  uid,
   profile,
 }: ChooseVotingGroupPageProps) => {
   const [existingGroups, setExistingGroups] = useState<string[]>([])

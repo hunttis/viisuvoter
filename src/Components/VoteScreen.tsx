@@ -1,4 +1,4 @@
-import React, { useState, useEffect, act } from 'react'
+import React, { useState, useEffect } from 'react'
 import { getDatabase, ref, onValue, set } from 'firebase/database'
 import { Profile, GlobalVotes, countryFlags, GroupVotes } from './Models'
 import { ResultTableGlobal } from './ResultTableGlobal'
