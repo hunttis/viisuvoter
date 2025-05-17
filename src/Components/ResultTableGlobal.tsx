@@ -54,14 +54,20 @@ const calculateGlobalScores = (
       scoreMap[country] = 0
     })
 
+  // Track users already counted
+  const countedUsers = new Set<string>()
+
   if (globalVotes && Object.entries(globalVotes).length > 0) {
-    Object.entries(globalVotes).forEach(([, groupVotes]) => {
-      Object.entries(groupVotes).forEach(([, votesFromUser]) => {
-        Object.entries(votesFromUser).forEach(([country, voteValue]) => {
-          if (scoreMap.hasOwnProperty(country)) {
-            scoreMap[country] += voteValue
-          }
-        })
+    Object.values(globalVotes).forEach((groupVotes) => {
+      Object.entries(groupVotes).forEach(([userId, votesFromUser]) => {
+        if (!countedUsers.has(userId)) {
+          countedUsers.add(userId)
+          Object.entries(votesFromUser).forEach(([country, voteValue]) => {
+            if (scoreMap.hasOwnProperty(country)) {
+              scoreMap[country] += voteValue
+            }
+          })
+        }
       })
     })
   }

@@ -120,35 +120,32 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
 
   return (
     <>
-      <table
-        className="table is-fullwidth is-narrow vote-table"
+      <div
+        className="is-fullwidth is-narrow vote-table"
         data-testid="vote-table"
       >
-        <thead>
-          <tr>
-            <th>
+        <div>
+          <div>
+            <div>
               <div className="title has-text-centered">{activeEvent}</div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+            </div>
+          </div>
+        </div>
+        <div>
           {countries.map((country) => (
             <React.Fragment key={country}>
-              <tr
+              <div
                 data-testid={`country-row-${country}`}
                 className="vote-country-row"
               >
-                <td
-                  colSpan={2}
-                  className="has-text-centered has-text-weight-semibold has-text-primary is-size-6 py-1 px-2 vote-country-name"
-                >
+                <div className="has-text-centered has-text-weight-semibold has-text-primary is-size-6 py-1 px-2 vote-country-name">
                   {countryFlags[country] || ''} {country}{' '}
                   {countryFlags[country] || ''}
-                </td>
-              </tr>
-              <tr>
-                <td colSpan={2} className="py-1 px-2 vote-buttons-row">
-                  <div className="buttons vote-buttons has-addons">
+                </div>
+              </div>
+              <div>
+                <div className="vote-buttons-row">
+                  <div className="buttons vote-buttons has-addons are-small">
                     {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => {
                       const isSelected = currentUserVotes[country] === points
                       const countryHasScore =
@@ -201,12 +198,12 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
                       )
                     })}
                   </div>
-                </td>
-              </tr>
+                </div>
+              </div>
             </React.Fragment>
           ))}
-        </tbody>
-      </table>
+        </div>
+      </div>
 
       <div className="columns is-multiline">
         <div className="column is-12" data-testid="global-results">
