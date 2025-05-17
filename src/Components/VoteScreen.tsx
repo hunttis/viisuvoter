@@ -3,7 +3,6 @@ import { getDatabase, ref, onValue, set } from 'firebase/database'
 import { Profile, GlobalVotes, countryFlags, GroupVotes } from './Models'
 import { ResultTableGlobal } from './ResultTableGlobal'
 import { ResultTableLocal } from './ResultTableLocal'
-import '../vote-screen.css'
 
 type VoteScreenProps = {
   profile: Profile
@@ -196,8 +195,8 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
         </div>
       </div>
 
-      <div className="columns is-multiline">
-        <div className="column is-12" data-testid="global-results">
+      <div className="grid p-3">
+        <div className="cell" data-testid="global-results">
           <ResultTableGlobal countries={countries} globalVotes={globalVotes} />
         </div>
 
@@ -205,7 +204,7 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
           return (
             <div
               key={groupId}
-              className="column is-6"
+              className="is-6 cell"
               data-testid={`group-section-${profile.groups.groupNames[groupId] || groupId}`}
             >
               <ResultTableLocal

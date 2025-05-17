@@ -15,8 +15,8 @@ describe('ResultTableLocal', () => {
         groupName={mockGroupName}
       />,
     )
-    expect(screen.getByText(/Current point totals for/)).toBeInTheDocument()
-    expect(screen.getByText(mockGroupName)).toBeInTheDocument()
+    // Updated: Only check for group name, not the old subtitle
+    expect(screen.getByTestId('group-name').textContent).toBe(mockGroupName)
   })
 
   it('calculates and sorts scores correctly', () => {
@@ -92,7 +92,7 @@ describe('ResultTableLocal', () => {
         groupName={mockGroupName}
       />,
     )
-    expect(screen.getByText(/Current point totals for/)).toBeInTheDocument()
-    expect(screen.getByText(mockGroupName)).toBeInTheDocument()
+    // Updated: Only check for group name, not the old subtitle
+    expect(screen.getByTestId('group-name').textContent).toBe(mockGroupName)
   })
 })

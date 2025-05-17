@@ -27,10 +27,8 @@ export const ResultTableGlobal = ({
   )
 
   return (
-    <div className="column">
-      <h2 className="title is-4">
-        Current point totals <strong>ACROSS ALL</strong> voting groups
-      </h2>
+    <div className="">
+      <h2 className="title is-4">🌍 Global 🌏</h2>
       {sortedGlobalCountryScores.map(
         (countryVotes: CountryVotes, index: number) => (
           <div key={`${index + countryVotes.name}`}>

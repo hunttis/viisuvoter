@@ -27,9 +27,8 @@ export const ResultTableLocal = ({
   )
 
   return (
-    <div className="column">
+    <div className="">
       <h2 className="title is-4" data-testid="group-subtitle">
-        Current point totals for <strong>YOUR</strong> voting group:{' '}
         <span className="has-text-success" data-testid="group-name">
           {groupName}
         </span>

@@ -1,3 +1,38 @@
+/* Combined styles from mystyle.css and vote-screen.css */
 .no-line-break {
   white-space: nowrap;
+}
+
+.body {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Custom styles for VoteScreen component */
+.vote-country-row {
+  height: 1.6rem;
+}
+
+.vote-country-name {
+  margin-top: 0.5rem;
+}
+
+.vote-buttons {
+  gap: 0.15rem;
+}
+
+.vote-btn {
+  flex: 1;
+}
+
+@media (prefers-color-scheme: light) {
+  .title,
+  .title.is-1,
+  .title.is-2,
+  .title.is-3,
+  .title.is-4,
+  .title.is-5,
+  .title.is-6 {
+    color: #111;
+  }
 }

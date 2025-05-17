@@ -31,7 +31,8 @@
     "vite": "vite",
     "vite-build": "vite build",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "deploy": "npm run vite-build && firebase deploy"
   },
   "name": "viisuvoter",
   "version": "1.0.0",

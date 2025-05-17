@@ -43,7 +43,7 @@ export const CountryScore = ({
   let fontSize = 'is-small'
   return (
     <div
-      className={`${size} ${color} ${additionalStyles}`}
+      className={`${size} ${color} ${additionalStyles} `}
       data-testid="country-score"
     >
       <div className={`is-fullwidth is-outlined ${color} ${fontSize}`}>
