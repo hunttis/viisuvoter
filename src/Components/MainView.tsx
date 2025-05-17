@@ -307,7 +307,7 @@ export const MainView = () => {
   )
 
   return (
-    <div className="container">
+    <div className="container" style={{ overflowX: 'hidden' }}>
       {showLoading ? (
         <div className="has-text-centered">
           <p className="is-size-4">Loading...</p>
@@ -324,19 +324,15 @@ export const MainView = () => {
         <AdminPage profile={profile!} onBack={() => setShowAdmin(false)} />
       ) : (
         <>
-          <div className="columns mu-8">
-            <div className="column ">
-              <h1 className="title is-1 has-text-centered">Eurovision Voter</h1>
-            </div>
-            <div className="column">
-              <TopRightButtons
-                profile={profile}
-                setShowAdmin={setShowAdmin}
-                setShowManageGroups={setShowManageGroups}
-                logout={logout}
-              />
-            </div>
+          <div className="has-text-centered mb-5">
+            <h1 className="title is-1">Eurovision Voter</h1>
           </div>
+          <TopRightButtons
+            profile={profile}
+            setShowAdmin={setShowAdmin}
+            setShowManageGroups={setShowManageGroups}
+            logout={logout}
+          />
 
           {activeEvent ? (
             profile?.groups?.groupNames &&
