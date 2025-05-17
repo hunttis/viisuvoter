@@ -54,11 +54,7 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
   // Compute group/global votes when all data is loaded
   useEffect(() => {
     // Only require groups and votes to be loaded
-    if (
-      Object.keys(groups).length > 0 &&
-      votes &&
-      Object.keys(votes).length > 0
-    ) {
+    if (Object.keys(groups).length > 0 && votes) {
       setCurrentUserVotes(votes[profile.uid] || {})
       const groupVotes: GroupVotes = {}
       const globalVotesData: GlobalVotes = {}
@@ -72,7 +68,11 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
         groupVotes[groupId] = {}
         globalVotesData[groupId] = {}
         memberIds.forEach((userId) => {
-          if (votes[userId]) {
+          // Only count if votes[userId] is a non-null object (including empty)
+          if (
+            votes.hasOwnProperty(userId) &&
+            typeof votes[userId] === 'object'
+          ) {
             groupVotes[groupId][userId] = votes[userId]
             globalVotesData[groupId][userId] = votes[userId]
           }
@@ -134,7 +134,7 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
               </div>
               <div>
                 <div className="vote-buttons-row">
-                  <div className="buttons vote-buttons has-addons are-small">
+                  <div className="buttons vote-buttons are-small is-gapless">
                     {[12, 10, 8, 7, 6, 5, 4, 3, 2, 1].map((points) => {
                       const isSelected = currentUserVotes[country] === points
                       const countryHasScore =
@@ -144,13 +144,13 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
                       ).some(([c, p]) => c !== country && p === points)
                       let btnClass = 'button vote-btn '
                       if (isSelected) {
-                        btnClass += 'is-primary'
+                        btnClass += 'is-primary '
                       } else if (countryHasScore) {
-                        btnClass += 'is-dark'
+                        btnClass += 'is-dark is-outlined '
                       } else if (scoreUsedElsewhere) {
-                        btnClass += 'is-dark'
+                        btnClass += 'is-dark is-outlined '
                       } else {
-                        btnClass += 'is-info'
+                        btnClass += 'is-info is-outlined'
                       }
                       return (
                         <button
@@ -170,6 +170,8 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
                                   `votes/${activeEvent}/${profile.uid}`,
                                 )
                                 set(votesRef, {})
+                                setCurrentUserVotes({}) // <-- Ensure local state is cleared so UI updates
+                                return // Exit early to avoid calling setCurrentUserVotes again below
                               }
                             } else {
                               Object.entries(newVotes).forEach(([c, p]) => {
