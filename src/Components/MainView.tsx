@@ -289,7 +289,7 @@ export const MainView = () => {
         >
           Manage Groups
         </button>
-        <button className="button is-light is-outlined" onClick={logout}>
+        <button className="button is-danger is-outlined" onClick={logout}>
           Logout
         </button>
       </div>

@@ -71,7 +71,7 @@ export const ResultTableLocal = ({
           {zeroPointCountries.length > 0 && (
             <div className="mt-4" data-testid="zero-point-countries">
               <div className="has-text-grey is-size-7">
-                No points: {zeroPointCountries.join(', ')}
+                <strong>No points:</strong> {zeroPointCountries.join(', ')}
               </div>
             </div>
           )}
