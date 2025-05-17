@@ -38,7 +38,6 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
       if (snapshot.exists()) {
         const val = snapshot.val()
         setVotes(val)
-        console.log('DEBUG votes fetched:', val)
       } else setVotes({})
     })
     const unsubGroups = onValue(groupsRef, (snapshot) => {
@@ -81,11 +80,6 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
       })
       setCurrentGroupVotes(groupVotes)
       setGlobalVotes(globalVotesData)
-      // Debug output
-      console.log('DEBUG groupVotes:', groupVotes)
-      console.log('DEBUG globalVotesData:', globalVotesData)
-      console.log('DEBUG votes:', votes)
-      console.log('DEBUG groups:', groups)
     }
   }, [votes, groups, profile.uid])
 
@@ -112,11 +106,6 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
   const userGroups: string[] = profile.groups?.groupNames
     ? Object.keys(profile.groups.groupNames)
     : []
-
-  // Debug output for local scores props
-  console.log('DEBUG userGroups:', userGroups)
-  console.log('DEBUG currentGroupVotes:', currentGroupVotes)
-  console.log('DEBUG countries:', countries)
 
   return (
     <>
@@ -211,13 +200,6 @@ export const VoteScreen = ({ profile, activeEvent }: VoteScreenProps) => {
         </div>
 
         {userGroups.map((groupId) => {
-          // Debug output for each ResultTableLocal
-          console.log('DEBUG ResultTableLocal props:', {
-            groupId,
-            groupName: profile.groups.groupNames[groupId] || groupId,
-            currentGroupVotes: currentGroupVotes[groupId] || {},
-            countries,
-          })
           return (
             <div
               key={groupId}

@@ -54,17 +54,14 @@ export const MainView = () => {
   useEffect(() => {
     const auth = getAuth()
     onAuthStateChanged(auth, async (user) => {
-      console.log('Auth state changed:', user?.uid)
       if (user) {
         setUid(user.uid)
         const db = getDatabase()
         const profileRef = ref(db, `users/${user.uid}`)
-        console.log('Setting up profile listener for:', user.uid)
         onValue(
           profileRef,
           (snapshot) => {
             const data = snapshot.val()
-            console.log('Profile data received:', data)
             if (data) {
               // Ensure the profile has all required fields
               const profileData: Profile = {
@@ -76,10 +73,8 @@ export const MainView = () => {
                   groupNames: data.groups?.groupNames || {},
                 },
               }
-              console.log('Processed profile data:', profileData)
               setProfile(profileData)
             } else {
-              console.log('No profile data found, creating new profile')
               const newProfile: Profile = {
                 uid: user.uid,
                 displayName: user.displayName || '',
@@ -89,14 +84,12 @@ export const MainView = () => {
                   groupNames: {},
                 },
               }
-              console.log('Creating new profile:', newProfile)
               set(profileRef, newProfile)
               setProfile(newProfile)
             }
             setShowLoading(false)
           },
           (error) => {
-            console.error('Error loading profile:', error)
             setShowLoading(false)
           },
         )
@@ -104,7 +97,6 @@ export const MainView = () => {
         // Load active event after user is authenticated
         await loadActiveEvent()
       } else {
-        console.log('No user logged in')
         // Reset all state when user logs out
         setProfile(null)
         setUid('')
@@ -222,9 +214,6 @@ export const MainView = () => {
 
   useEffect(() => {
     if (profile && activeEvent) {
-      console.log('Profile:', profile)
-      console.log('Active Event:', activeEvent)
-      console.log('User Groups:', profile.groups?.groupNames)
     }
   }, [profile, activeEvent])
 
@@ -298,11 +287,6 @@ export const MainView = () => {
     setGroupName('')
   }
 
-  console.log('currentUserVotes: ', currentUserVotes)
-  console.log('currentGroupVotes: ', currentGroupVotes)
-  console.log('globalVotes: ', globalVotes)
-  console.log('countries: ', countries)
-
   const auth = getAuth()
   const currentUser = auth.currentUser
 
@@ -311,8 +295,6 @@ export const MainView = () => {
   const showVoting = countries && uid && activeGroupName && activeEvent
 
   const isAdmin = profile?.isAdmin === true
-  console.log('Profile:', profile)
-  console.log('Is Admin:', isAdmin)
 
   const login = async () => {
     try {
@@ -336,8 +318,6 @@ export const MainView = () => {
   }
 
   const userGroups = profile?.groups?.groupNames || []
-  console.log('Debug - Active Event:', activeEvent)
-  console.log('Debug - User Groups:', userGroups)
 
   // Update the ManageGroupsPage back button handler
   const handleManageGroupsBack = () => {
