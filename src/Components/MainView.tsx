@@ -11,7 +11,7 @@ import { VoteScreen } from './VoteScreen'
 import { LoginPage } from './LoginPage'
 import { ManageGroupsPage } from './ManageGroupsPage'
 import { AdminPage } from './AdminPage'
-import { GroupVotes, Profile, UserVotes, GlobalVotes } from './Models'
+import { Profile, UserVotes } from './Models'
 
 export const pointAmounts = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
 
@@ -39,13 +39,9 @@ const GroupsBar: React.FC<{
 
 export const MainView = () => {
   const [profile, setProfile] = useState<Profile | null>(null)
-  const [currentUserVotes, setCurrentUserVotes] = useState<UserVotes[]>([])
   const [activeGroupName, setActiveGroupName] = useState<string>('')
   const [showManageGroups, setShowManageGroups] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
-  const [countries, setCountries] = useState<string[]>([])
-  const [currentGroupVotes, setCurrentGroupVotes] = useState<GroupVotes>({})
-  const [globalVotes, setGlobalVotes] = useState({})
   const [uid, setUid] = useState<string>('')
   const [showLogin, setShowLogin] = useState(false)
   const [showLoading, setShowLoading] = useState(true)
@@ -89,7 +85,7 @@ export const MainView = () => {
             }
             setShowLoading(false)
           },
-          (error) => {
+          () => {
             setShowLoading(false)
           },
         )
@@ -101,9 +97,6 @@ export const MainView = () => {
         setProfile(null)
         setUid('')
         setActiveGroupName('')
-        setCurrentUserVotes([])
-        setCurrentGroupVotes({})
-        setGlobalVotes({})
         setActiveEvent(null)
         setShowLoading(false)
         setShowLogin(true) // Show login page
@@ -177,26 +170,9 @@ export const MainView = () => {
             userVotes.push(data[groupName][profile.displayName])
           }
         })
-        setCurrentUserVotes(userVotes)
-        setCurrentGroupVotes(data[activeGroupName] || {})
       }
     })
   }, [profile, activeEvent, activeGroupName])
-
-  useEffect(() => {
-    if (!activeEvent) return
-
-    const db = getDatabase()
-    const countriesRef = ref(db, `votingEvents/${activeEvent}`)
-
-    onValue(countriesRef, (snapshot) => {
-      const data = snapshot.val()
-      if (data) {
-        const countriesList: string[] = data.countries || []
-        setCountries(countriesList)
-      }
-    })
-  }, [activeEvent])
 
   useEffect(() => {
     const db = getDatabase()
@@ -216,34 +192,6 @@ export const MainView = () => {
     if (profile && activeEvent) {
     }
   }, [profile, activeEvent])
-
-  useEffect(() => {
-    if (!profile || !activeGroupName) return
-
-    const db = getDatabase()
-    const groupVotesRef = ref(db, `votes/${activeGroupName}`)
-
-    onValue(groupVotesRef, (snapshot) => {
-      const data = snapshot.val()
-      if (data) {
-        const groupScores: Record<string, number> = {}
-
-        // Aggregate votes for each country
-        Object.values(data).forEach((userVotes: any) => {
-          Object.entries(userVotes).forEach(
-            ([country, voteValue]: [string, any]) => {
-              groupScores[country] =
-                (groupScores[country] || 0) + parseInt(voteValue, 10)
-            },
-          )
-        })
-
-        setCurrentGroupVotes(groupScores)
-      } else {
-        setCurrentGroupVotes({})
-      }
-    })
-  }, [profile, activeGroupName])
 
   const loadActiveEvent = async () => {
     try {
@@ -269,32 +217,7 @@ export const MainView = () => {
     }
   }
 
-  const onSubmitGroupName = async () => {
-    if (!profile || !uid) return
-
-    const db = getDatabase()
-    const newGroupRef = ref(db, `groups/${groupName}`)
-
-    // Create the new group with the user as a member
-    await set(newGroupRef, {
-      name: groupName,
-      createdBy: uid,
-      members: {
-        [uid]: true,
-      },
-    })
-
-    setGroupName('')
-  }
-
   const auth = getAuth()
-  const currentUser = auth.currentUser
-
-  const showJoinGroup =
-    countries && currentUser && activeEvent && !activeGroupName
-  const showVoting = countries && uid && activeGroupName && activeEvent
-
-  const isAdmin = profile?.isAdmin === true
 
   const login = async () => {
     try {
@@ -316,8 +239,6 @@ export const MainView = () => {
       console.error('Logout error:', error)
     }
   }
-
-  const userGroups = profile?.groups?.groupNames || []
 
   // Update the ManageGroupsPage back button handler
   const handleManageGroupsBack = () => {
