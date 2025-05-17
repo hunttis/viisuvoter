@@ -35,4 +35,21 @@
   .title.is-6 {
     color: #111;
   }
+  /* Unselected, available: lighter */
+  .vote-btn.is-info.is-outlined {
+    background-color: #f5f5f5;
+    color: #222;
+    border-color: #b5b5b5;
+  }
+  /* Selected or unavailable: darker */
+  .vote-btn.is-primary {
+    background-color: #363636;
+    color: #fff;
+    border-color: #363636;
+  }
+  .vote-btn.is-dark.is-outlined {
+    background-color: #e0e0e0;
+    color: #444;
+    border-color: #b5b5b5;
+  }
 }
