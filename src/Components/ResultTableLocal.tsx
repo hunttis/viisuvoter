@@ -16,11 +16,28 @@ export const ResultTableLocal = ({
   // Debug prints
   console.log('DEBUG ResultTableLocal: countries', countries)
   console.log('DEBUG ResultTableLocal: currentGroupVotes', currentGroupVotes)
+
+  // Calculate and sort scores
   const sortedLocalCountryScores = calculateLocalGroupScores(
     countries,
     currentGroupVotes,
     groupName,
   )
+
+  // Find countries with zero points, alphabetized
+  const zeroPointCountries = sortedLocalCountryScores
+    .filter((c) => c.votes === 0)
+    .map((c) => c.name)
+    .sort((a, b) => a.localeCompare(b))
+
+  // Only show countries with >0 points in the ranking
+  const rankedCountries = sortedLocalCountryScores.filter((c) => c.votes > 0)
+
+  // Check if there are any votes at all in the group
+  const anyVotes = Object.values(currentGroupVotes).some(
+    (userVotes) => Object.keys(userVotes).length > 0,
+  )
+
   console.log(
     'DEBUG ResultTableLocal: sortedLocalCountryScores',
     sortedLocalCountryScores,
@@ -33,14 +50,34 @@ export const ResultTableLocal = ({
           {groupName}
         </span>
       </h2>
-      {sortedLocalCountryScores.map((countryVotes, index: number) => (
-        <div
-          key={`countryscore-${index}`}
-          data-testid={`country-score-${countryVotes.name}`}
+      {/* If no votes at all, show info message */}
+      {!anyVotes ? (
+        <span
+          className="tag is-medium has-background-black-ter has-text-white-ter"
+          data-testid="no-votes-message"
         >
-          <CountryScore countryVotes={countryVotes} index={index} />
-        </div>
-      ))}
+          No votes
+        </span>
+      ) : (
+        <>
+          {rankedCountries.map((countryVotes, index: number) => (
+            <div
+              key={`countryscore-${index}`}
+              data-testid={`country-score-${countryVotes.name}`}
+            >
+              <CountryScore countryVotes={countryVotes} index={index} />
+            </div>
+          ))}
+          {/* List zero-point countries at the bottom, alphabetized */}
+          {zeroPointCountries.length > 0 && (
+            <div className="mt-4" data-testid="zero-point-countries">
+              <div className="has-text-grey is-size-7">
+                No points: {zeroPointCountries.join(', ')}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

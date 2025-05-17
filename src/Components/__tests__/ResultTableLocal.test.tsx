@@ -69,16 +69,23 @@ describe('ResultTableLocal', () => {
         groupName={mockGroupName}
       />,
     )
-    const rows = screen.getAllByTestId('country-score')
-    const text = rows.map((row) => row.textContent || '')
-    expect(text.some((t) => t.includes('Finland') && t.includes('12'))).toBe(
-      true,
+    // Only Finland should be in the score list
+    expect(screen.getByTestId('country-score-Finland').textContent).toContain(
+      '12',
     )
-    expect(text.some((t) => t.includes('Sweden') && t.includes('0'))).toBe(true)
-    expect(text.some((t) => t.includes('Norway') && t.includes('0'))).toBe(true)
-    expect(text.some((t) => t.includes('Denmark') && t.includes('0'))).toBe(
-      true,
-    )
+    // The other countries should not be in the score list
+    expect(screen.queryByTestId('country-score-Sweden')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('country-score-Norway')).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('country-score-Denmark'),
+    ).not.toBeInTheDocument()
+    // The zero-point countries should be listed in the zero-point-countries box
+    const zeroBox = screen.getByTestId('zero-point-countries')
+    expect(zeroBox).toBeInTheDocument()
+    expect(zeroBox.textContent).toContain('No points:')
+    expect(zeroBox.textContent).toContain('Sweden')
+    expect(zeroBox.textContent).toContain('Norway')
+    expect(zeroBox.textContent).toContain('Denmark')
   })
 
   it('renders nothing for empty countries array', () => {

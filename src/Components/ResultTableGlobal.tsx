@@ -26,15 +26,30 @@ export const ResultTableGlobal = ({
     globalVotes,
   )
 
+  // New: Find countries with zero points, alphabetized
+  const zeroPointCountries = sortedGlobalCountryScores
+    .filter((c) => c.votes === 0)
+    .map((c) => c.name)
+    .sort((a, b) => a.localeCompare(b))
+
+  // Only show countries with >0 points in the ranking
+  const rankedCountries = sortedGlobalCountryScores.filter((c) => c.votes > 0)
+
   return (
     <div className="">
       <h2 className="title is-4">🌍 Global 🌏</h2>
-      {sortedGlobalCountryScores.map(
-        (countryVotes: CountryVotes, index: number) => (
-          <div key={`${index + countryVotes.name}`}>
-            <CountryScore countryVotes={countryVotes} index={index} />
+      {rankedCountries.map((countryVotes: CountryVotes, index: number) => (
+        <div key={`${index + countryVotes.name}`}>
+          <CountryScore countryVotes={countryVotes} index={index} />
+        </div>
+      ))}
+      {/* New: List zero-point countries at the bottom */}
+      {zeroPointCountries.length > 0 && (
+        <div className="mt-4" data-testid="zero-point-countries">
+          <div className="has-text-grey is-size-7">
+            No points: {zeroPointCountries.join(', ')}
           </div>
-        ),
+        </div>
       )}
     </div>
   )
