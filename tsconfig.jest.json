@@ -10,7 +10,11 @@
       "react-dom"
     ],
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "module": "CommonJS",
+    "moduleResolution": "node16",
+    "allowImportingTsExtensions": false,
+    "ignoreDeprecations": "5.0"
   },
   "include": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/setupTests.ts"]
 }

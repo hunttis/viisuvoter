@@ -1,6 +1,5 @@
-import React from 'react'
 import { getAuth, signOut } from 'firebase/auth'
-import { Profile } from './Models'
+import { Profile, VoteProfile } from './Models'
 
 interface UserOptionsProps {
   uid: string
@@ -10,13 +9,13 @@ interface UserOptionsProps {
 }
 
 export const UserOptions = ({
-  uid,
   activeVote,
   setActiveGroupName,
   profile,
 }: UserOptionsProps) => {
   const auth = getAuth()
-  const userGroups = profile[activeVote]?.groupNames || []
+  const profileByEvent = profile as unknown as Record<string, VoteProfile | undefined>
+  const userGroups = profileByEvent[activeVote]?.groupNames || []
 
   return (
     <div className="navbar is-light">
@@ -26,7 +25,7 @@ export const UserOptions = ({
             <div className="control">
               <div className="select">
                 <select
-                  value={profile[activeVote]?.groupNames?.[0] || ''}
+                  value={profileByEvent[activeVote]?.groupNames?.[0] || ''}
                   onChange={(e) => setActiveGroupName(e.target.value)}
                 >
                   {userGroups.map((group) => (

@@ -1,4 +1,3 @@
-import React from 'react'
 import { initializeApp } from 'firebase/app'
 import { MainView } from './Components/MainView.jsx'
 import { createRoot } from 'react-dom/client'
@@ -11,7 +10,7 @@ import { firebaseConfig } from '../config.js'
 const container = document.getElementById('root')
 
 const App = () => {
-  const firebaseApp = initializeApp(firebaseConfig)
+  initializeApp(firebaseConfig)
 
   return (
     <div className="App" data-theme="dark">

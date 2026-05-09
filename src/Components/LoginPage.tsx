@@ -1,6 +1,3 @@
-import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth'
-import React from 'react'
-
 type LoginPageProps = {
   onLogin: () => Promise<void>
 }
